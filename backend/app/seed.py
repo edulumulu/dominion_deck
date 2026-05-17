@@ -160,15 +160,24 @@ def seed_database():
             for row in reader:
                 eng_name = row["card_name"]
                 eng_set = row["set_name"]
+                raw_is_kingdom = row["is_kingdom_card"].strip() == "1"
+                card_type = row["type"]
+                card_text = row["card_text"]
+                is_kingdom = (
+                    raw_is_kingdom
+                    and "This is not in the Supply." not in card_text
+                    and not any(card_type.endswith(t) for t in ["Ruins", "Shelter", "Prize"])
+                )
+
                 card = Card(
                     card_name=eng_name,
                     card_name_es=CARD_TRANSLATIONS.get(eng_name, eng_name),
                     set_name=eng_set,
                     set_name_es=EXPANSION_TRANSLATIONS.get(eng_set, eng_set),
-                    type=row["type"],
-                    is_kingdom_card=row["is_kingdom_card"].strip() == "1",
+                    type=card_type,
+                    is_kingdom_card=is_kingdom,
                     cost=row["cost"],
-                    card_text=row["card_text"],
+                    card_text=card_text,
                 )
                 db.add(card)
 

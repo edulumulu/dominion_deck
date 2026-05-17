@@ -92,6 +92,27 @@ def random_cards(
         if exp.notes:
             special_rules.append(f"[{exp.name}] {exp.notes}")
 
+    selected_names = {c.card_name for c in selected_cards}
+
+    CARD_EXTRA_RULES = {
+        "Witch": "Witch añade Maldiciones al suministro.",
+        "Familiar": "Familiar añade Maldiciones al suministro.",
+        "Cultist": "Cultist añade Ruinas al suministro.",
+        "Marauder": "Marauder añade Ruinas y Spoils al suministro.",
+        "Pillage": "Pillage añade Spoils al suministro.",
+        "Bandit Camp": "Bandit Camp añade Spoils al suministro.",
+        "Hermit": "Hermit añade Madman al suministro (fuera del suministro normal).",
+        "Urchin": "Urchin añade Mercenary (se obtiene al traspasar Urchin).",
+        "Young Witch": "Young Witch requiere un 11º mazo de Reino (Bane card) de coste $2-$3.",
+        "Tournament": "Tournament añade los Prizes (Bolsa de Oro, Diadema, Seguidores, Princesa, Corcel Fiel).",
+        "Page": "Page añade la cadena Traveller: Treasure Hunter → Disciple → Soldier → Fugitive → Hero → Champion.",
+        "Peasant": "Peasant añade Teacher en la cadena Traveller.",
+    }
+
+    for name, rule in CARD_EXTRA_RULES.items():
+        if name in selected_names:
+            special_rules.append(f"[{name}] {rule}")
+
     return RandomCardsResponse(
         cards=[CardOut.model_validate(c) for c in selected_cards],
         active_expansions=exp_names,

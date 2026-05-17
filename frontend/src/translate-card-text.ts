@@ -1,148 +1,409 @@
-const REPLACEMENTS: [RegExp, string][] = [
-  [/\+\$(\d+)/g, "+$1"],
-  [/\+\$(\d+)/g, "+$1"],
-  [/\+(1) Card\(s?\)/g, "+$1 Carta"],
-  [/\+(1) Cards?/g, "+$1 Carta"],
-  [/\+(2|3|4|5|6) Cards?/g, "+$1 Cartas"],
-  [/\+(1) Action\(s?\)/g, "+$1 Acción"],
-  [/\+(1) Actions?/g, "+$1 Acción"],
-  [/\+(2|3|4|5|6) Actions?/g, "+$1 Acciones"],
-  [/\+(1) Buy\(s?\)/g, "+$1 Compra"],
-  [/\+(1) Buys?/g, "+$1 Compra"],
-  [/\+(2|3|4|5|6) Buys?/g, "+$1 Compras"],
-  [/\+(1)VP\b/g, "+$1 PV"],
-  [/\+(1) Victory/g, "+$1 Victoria"],
-  [/\+(2|3|4|5|6) Victory/g, "+$1 Victorias"],
-  [/\bWorth\s*1VP\b/g, "Vale 1PV"],
-  [/\bWorth\s*2VP\b/g, "Vale 2PV"],
-  [/\bWorth\s*(0|1|2|3|4|5) VP\b/g, "Vale $1PV"],
-  [/\bWorth\s*\$(\d)/g, "Vale \$$1"],
-  [/\bWorth\s*(\d+)\s*Coins?\b/g, "Vale $1 Monedas"],
+/**
+ * Longer phrases must come before shorter ones so shared
+ * prefixes are matched at the most specific level first.
+ */
 
-  [/\bYou may\b/g, "Puedes"],
-  [/\bChoose one\b/g, "Elige una"],
-  [/\bChoose two\b/g, "Elige dos"],
+const PHRASES: [string, string][] = [
+  ["This is not in the Supply", "No está en el Suministro"],
+  ["This stays in play", "Esto permanece en juego"],
+  ["the rest of the game", "el resto de la partida"],
+  ["for the rest of the game", "por el resto de la partida"],
 
-  [/\bTrash this card\b/g, "Elimina esta carta"],
-  [/\bTrash this\b/g, "Elimina esta"],
-  [/\bTrash\b/g, "Elimina"],
+  // "set aside" as adjective comes BEFORE the verb form
+  [" set aside cards", " cartas apartadas"],
+  ["set aside cards", "cartas apartadas"],
+  [" set aside card", " carta apartada"],
+  ["set aside card", "carta apartada"],
 
-  [/\bGain a\b/g, "Gana un"],
-  [/\bGain an\b/g, "Gana un"],
-  [/\bGain\b/g, "Gana"],
+  // Actions
+  ["Directly after resolving an Action",
+   "Justo después de resolver una Acción"],
 
-  [/\bDiscard any number of cards?\b/g, "Descarta cualquier número de cartas"],
-  [/\bDiscard it\b/g, "descartarla"],
-  [/\bDiscard them\b/g, "descartarlas"],
-  [/\bDiscard the other\b/g, "Descarta las otras"],
-  [/\bDiscard the rest\b/g, "Descarta el resto"],
-  [/\bDiscard down to\b/g, "Descarta hasta"],
-  [/\bDiscard\b(?!\s*the\s*rest)/g, "Descarta"],
+  // Drawing
+  ["Draw until", "Roba hasta"],
+  ["draw until", "roba hasta"],
+  ["draw an extra card", "roba una carta extra"],
+  ["after you finish drawing", "después de terminar de robar"],
+  ["finish drawing", "terminar de robar"],
+  ["as you draw them", "mientras las robas"],
+  ["as you draw", "mientras robas"],
+  ["Draws ", "Roba "],
+  ["draws ", "roba "],
+  [" draws ", " roba "],
+  [" Draw ", " Roba "],
+  [" draw ", " roba "],
+  [" drawn", " robadas"],
+  [" drawing", " robando"],
 
-  [/\bReveal your hand\b/g, "Revela tu mano"],
-  [/\bReveal the top\b/g, "Revela las primeras"],
-  [/\bReveal any number\b/g, "Revela cualquier número"],
-  [/\bReveal a\b/g, "Revela un"],
-  [/\bReveal\b/g, "Revela"],
+  // Discard
+  ["Discard any number of cards", "Descarta cualquier número de cartas"],
+  ["Discard any number", "Descarta cualquier número"],
+  ["discard any number", "descarta cualquier número"],
+  ["discard the", "descarta las"],
+  [" discard ", " descarta "],
+  ["\nDiscard ", "\nDescarta "],
+  ["Discard ", "Descarta "],
+  [" discards ", " descarta "],
+  ["Discards ", "Descarta "],
+  ["Discard it", "Descártala"],
+  ["discard it", "descártala"],
+  ["discard them", "descartarlas"],
 
-  [/\beach other player\b/g, "los demás jugadores"],
-  [/\bEach other player\b/g, "Los demás jugadores"],
-  [/\beach player\b/g, "cada jugador"],
-  [/\bEach player\b/g, "Cada jugador"],
-  [/\bother players?\b/g, "otros jugadores"],
+  // Trash
+  ["Trash this card", "Elimina esta carta"],
+  ["trash this card", "elimina esta carta"],
+  [" trashed card", " carta eliminada"],
+  [" trashed cards", " cartas eliminadas"],
+  ["Trashed cards", "Cartas eliminadas"],
+  ["the trashed card", "la carta eliminada"],
+  ["the trashed cards", "las cartas eliminadas"],
+  [" trashes", " elimina"],
+  [" trash ", " elimina "],
+  ["\nTrash ", "\nElimina "],
+  ["Trash ", "Elimina "],
 
-  [/\bthe Supply\b/g, "el Suministro"],
-  [/\bsupply piles?\b/g, "pila del Suministro"],
-  [/\bSupply piles?\b/g, "Pila del Suministro"],
+  // Gain
+  ["Gain a ", "Gana un "],
+  ["gain a ", "gana un "],
+  ["Gain an ", "Gana un "],
+  ["gain an ", "gana un "],
 
-  [/\byour deck\b/g, "tu mazo"],
-  [/\byour hand\b/g, "tu mano"],
-  [/\byour discard pile\b/g, "tu pila de descartes"],
-  [/\binto your hand\b/g, "a tu mano"],
-  [/\bon top of\b/g, "sobre"],
-  [/\bput (it|them) into your hand\b/g, "ponlas en tu mano"],
-  [/\bput (it|them) back\b/g, "ponlo de vuelta"],
-  [/\bPut it\b/g, "Ponlo"],
-  [/\bput it\b/g, "ponlo"],
+  // Put into / on top
+  ["put them into your hand", "ponlos en tu mano"],
+  ["put it into your hand", "ponlo en tu mano"],
+  [" into your hand", " a tu mano"],
+  [" on top of your deck", " sobre tu mazo"],
+  ["on top of your deck", "sobre tu mazo"],
+  [" on top of", " sobre"],
+  ["putting them on top", "poniéndolos sobre"],
+  ["putting it on top", "poniéndolo sobre"],
 
-  [/\bset aside\b/g, "aparta"],
-  [/\bSet aside\b/g, "Aparta"],
+  // Turn references
+  [" at the start of your next turn",
+   " al comienzo de tu próximo turno"],
+  ["At the start of your next turn",
+   "Al comienzo de tu próximo turno"],
+  [" at the start of your turn",
+   " al comienzo de tu turno"],
+  ["At the start of your turn",
+   "Al comienzo de tu turno"],
+  [" when you discard this from play",
+   " cuando descartes esto de juego"],
+  ["When you discard this from play",
+   "Cuando descartes esto de juego"],
+  [" when you play this",
+   " cuando juegues esto"],
+  ["When you play this",
+   "Cuando juegues esto"],
+  [" when you gain this",
+   " cuando ganes esto"],
+  ["When you gain this",
+   "Cuando ganes esto"],
+  [" when you buy this",
+   " cuando compres esto"],
+  ["When you buy this",
+   "Cuando compres esto"],
+  [" when you trash this",
+   " cuando elimines esto"],
+  ["When you trash this",
+   "Cuando elimines esto"],
+  [" a turn", " un turno"],
+  [" this turn", " este turno"],
+  ["This turn", "Este turno"],
+  ["next turn", "próximo turno"],
+  ["last turn", "último turno"],
+  ["an extra turn", "un turno extra"],
 
-  [/\bWhen you (play|gain|buy|trash|discard) this\b/g, "Cuando $1 esto"],
-  [/\bwhen you (play|gain|buy|trash|discard) this\b/g, "cuando $1 esto"],
+  // Player references
+  ["the player to your left", "el jugador a tu izquierda"],
+  ["the player to your right", "el jugador a tu derecha"],
+  ["Other players", "Los demás jugadores"],
+  ["each other player", "cada otro jugador"],
+  ["Each other player", "Cada otro jugador"],
+  ["revealed a hand with no", "revelado una mano sin"],
+  ["Reveal a hand with no", "Revela una mano sin"],
 
-  [/\bAt the start of your next turn\b/g, "Al comienzo de tu próximo turno"],
-  [/\bAt the start of Clean-up\b/g, "Al comienzo de la Limpieza"],
-  [/\bAt the start of your turn\b/g, "Al comienzo de tu turno"],
-  [/\bDirectly after resolving an Action\b/g, "Justo después de resolver una Acción"],
-  [/\bDuring your (Action|Buy) phase\b/g, "Durante tu fase de $1"],
+  // Hand / deck
+  [" your hand", " tu mano"],
+  ["Your hand", "Tu mano"],
+  [" your discard pile", " tu pila de descartes"],
+  ["Your discard pile", "Tu pila de descartes"],
+  [" your deck", " tu mazo"],
+  ["Your deck", "Tu mazo"],
+  ["your choice", "tu elección"],
+  ["your choosing", "tu elección"],
 
-  [/\bAction cards?\b/g, "carta de Acción"],
-  [/\bTreasure cards?\b/g, "carta de Tesoro"],
-  [/\bVictory cards?\b/g, "carta de Victoria"],
-  [/\bAttack cards?\b/g, "carta de Ataque"],
-  [/\bReaction cards?\b/g, "carta de Reacción"],
-  [/\bDuration cards?\b/g, "carta de Duración"],
-  [/\bAction\b(?! cards?)/g, "Acción"],
-  [/\bTreasure\b(?! cards?)/g, "Tesoro"],
-  [/\bVictory\b(?! cards?)/g, "Victoria"],
-  [/\bAttack\b(?! cards?)/g, "Ataque"],
+  // Reveal
+  ["Reveal the top", "Revela las primeras"],
+  ["reveal the top", "revela las primeras"],
+  ["Reveal your hand", "Revela tu mano"],
+  ["reveal your hand", "revela tu mano"],
+  ["reveal a card", "revela una carta"],
+  ["Reveal a card", "Revela una carta"],
+  ["reveal a Treasure", "revela un Tesoro"],
+  [" Reveal ", " Revela "],
+  [" reveal ", " revela "],
 
-  [/\bAction phase\b/g, "fase de Acción"],
-  [/\bBuy phase\b/g, "fase de Compra"],
-  [/\bClean-up phase\b/g, "fase de Limpieza"],
+  // Supply
+  ["the Supply", "el Suministro"],
+  ["The Supply", "El Suministro"],
+  ["supply pile", "pila del suministro"],
+  ["Supply pile", "pila del Suministro"],
+  ["supply piles", "pilas del suministro"],
+  ["Supply piles", "pilas del Suministro"],
+  ["If there are one or more empty Supply piles",
+   "Si hay una o más pilas del Suministro vacías"],
 
-  [/\bcosting up to\b/g, "que cueste hasta"],
-  [/\bcosting exactly\b/g, "que cueste exactamente"],
-  [/\bcosting at most\b/g, "que cueste como máximo"],
-  [/\bcosting less than\b/g, "que cueste menos de"],
-  [/\bcosting\b/g, "que cueste"],
+  // Set aside (verb – comes AFTER adjective patterns)
+  ["set aside", "apartar"],
+  ["Set aside", "Aparta"],
+  ["setting it aside", "apartándola"],
+  ["set it aside", "apártala"],
 
-  [/\bper (different|Action|Victory|Treasure)/g, "por $1"],
+  // Cost
+  ["costing exactly", "que cueste exactamente"],
+  ["costing up to", "que cueste hasta"],
+  ["costing at most", "que cueste como máximo"],
+  ["costing less than", "que cueste menos de"],
+  ["costs ", "cuesta "],
+  ["The cards cost", "Las cartas cuestan"],
+  ["cards cost", "cartas cuestan"],
 
-  [/\bThis is not in the Supply\b/g, "No está en el Suministro"],
-  [/\b(This stays in play\.?)/g, "(Esto permanece en juego.)"],
+  // VP
+  ["Worth 0 VP", "Vale 0 PV"],
+  ["Worth 1VP", "Vale 1PV"],
+  ["Worth 2VP", "Vale 2PV"],
+  ["Worth 3VP", "Vale 3PV"],
+  ["Worth 4VP", "Vale 4PV"],
+  ["Worth 5VP", "Vale 5PV"],
+  ["Worth 6VP", "Vale 6PV"],
+  ["Worth 10VP", "Vale 10PV"],
 
-  [/\bCopper\b/g, "Cobre"],
-  [/\bSilver\b/g, "Plata"],
-  [/\bGold\b/g, "Oro"],
-  [/\bEstate\b/g, "Finca"],
-  [/\bDuchy\b/g, "Ducado"],
-  [/\bProvince\b/g, "Provincia"],
-  [/\bCurse\b/g, "Maldición"],
-  [/\bPotion\b/g, "Poción"],
-  [/\bPlatinum\b/g, "Platino"],
-  [/\bColony\b/g, "Colonia"],
-  [/\bSpoils\b/g, "Botín"],
-  [/\bRuins\b/g, "Ruinas"],
+  // Misc common
+  ["Choose one", "Elige una"],
+  ["Choose two", "Elige dos"],
+  ["You may", "Puedes"],
+  ["you may", "puedes"],
+  ["you can", "puedes"],
+  [" at least", " al menos"],
+  ["at least", "al menos"],
+  [" face down", " boca abajo"],
+  [" face up", " boca arriba"],
+  ["face down", "boca abajo"],
+  ["face up", "boca arriba"],
+  [" in any order", " en cualquier orden"],
+  ["in either order", "en cualquier orden"],
+  ["Do this twice", "Haz esto dos veces"],
+  ["(round down)", "(redondeado hacia abajo)"],
+  ["(rounded down)", "(redondeado hacia abajo)"],
+  ["other than", "que no sea"],
+  ["instead of", "en lugar de"],
+  ["a copy of it", "una copia de ella"],
+  ["a copy of that", "una copia de esa"],
+  ["a copy of", "una copia de"],
+  [" at the end of the game",
+   " al final de la partida"],
+  [" at end of turn", " al final del turno"],
+  ["(at end of turn)", "(al final del turno)"],
+  ["At the end of", "Al final de"],
+  [" at the end of", " al final de"],
+  ["Once per game", "Una vez por partida"],
+  ["Once per turn", "Una vez por turno"],
+  [" per ", " por "],
+  ["Per ", "Por "],
+  [" differently named card",
+   " carta de nombre diferente"],
+  ["differently named card",
+   "carta de nombre diferente"],
+  [" differently named cards",
+   " cartas de nombre diferente"],
+  ["differently named cards",
+   "cartas de nombre diferente"],
+  ["may look through", "puede buscar en"],
+  ["You may look at", "Puedes mirar"],
+  ["you may look at", "puedes mirar"],
+  ["Look through", "Busca en"],
+  ["look through", "busca en"],
+  ["When scoring", "Al puntuar"],
+  ["When you would", "Cuando fueras a"],
+  ["When you gain", "Cuando ganas"],
+  ["When you ", "Cuando "],
+  ["may choose", "puede elegir"],
+  ["no cards in hand", "sin cartas en la mano"],
+  [" 5 cards", " 5 cartas"],
+  [" 4 cards", " 4 cartas"],
+  [" 3 cards", " 3 cartas"],
+  [" 2 cards", " 2 cartas"],
+  ["It's your ", "Es tu "],
+  ["it's your ", "es tu "],
 
-  [/\boven\b/g, "horno"],
-  [/\bdeck\b/g, "mazo"],
-  [/\bhand\b/g, "mano"],
-  [/\bturn\b/g, "turno"],
-  [/\bcards?\b/g, "carta"],
-  [/\bRuins\b/g, "Ruinas"],
-  [/\bMadman\b/g, "Loco"],
-  [/\bMercenary\b/g, "Mercenario"],
-  [/\bChampion\b/g, "Campeón"],
-  [/\bTeacher\b/g, "Maestro"],
-  [/\bDisciple\b/g, "Discípulo"],
-  [/\bSoldier\b/g, "Soldado"],
-  [/\bFugitive\b/g, "Fugitivo"],
-  [/\bHero\b/g, "Héroe"],
-  [/\bWarrior\b/g, "Guerrero"],
-  [/\bTreasure Hunter\b/g, "Cazador de Tesoros"],
-  [/\bPage\b/g, "Paje"],
-  [/\bPeasant\b/g, "Campesino"],
-  [/\bSpoils\b/g, "Botín"],
-  [/\bShelters?\b/g, "Refugio"],
-  [/\bPrize\b/g, "Premio"],
+  // Short verbs (broad, keep late)
+  ["Gain ", "Gana "],
+  ["gain ", "gana "],
+  ["costing ", "que cueste "],
+
+  // the Coppers / Gold / Silver
+  ["the Coppers", "los Cobres"],
+  ["the Gold", "el Oro"],
+  ["the Silver", "la Plata"],
 ];
 
-export function translateCardText(text: string): string {
-  let result = text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n");
-  for (const [pattern, replacement] of REPLACEMENTS) {
-    result = result.replace(pattern, replacement);
+const TYPES: [string, string][] = [
+  ["Action-Attack-Duration", "Acción-Ataque-Duración"],
+  ["Action-Attack-Knight", "Acción-Ataque-Caballero"],
+  ["Action-Attack-Looter", "Acción-Ataque-Saqueador"],
+  ["Action-Duration-Reaction", "Acción-Duración-Reacción"],
+  ["Action-Reserve-Victory", "Acción-Reserva-Victoria"],
+  ["Action-Attack-Traveller", "Acción-Ataque-Viajero"],
+  ["Action-Attack", "Acción-Ataque"],
+  ["Action-Duration", "Acción-Duración"],
+  ["Action-Treasure", "Acción-Tesoro"],
+  ["Action-Prize", "Acción-Premio"],
+  ["Action-Reaction", "Acción-Reacción"],
+  ["Action-Reserve", "Acción-Reserva"],
+  ["Action-Traveller", "Acción-Viajero"],
+  ["Action-Looter", "Acción-Saqueador"],
+  ["Action-Ruins", "Acción-Ruinas"],
+  ["Action-Shelter", "Acción-Shelter"],
+  ["Action-Gathering", "Acción-Reunión"],
+  ["Action-Victory", "Acción-Victoria"],
+  ["Victory-Reaction", "Victoria-Reacción"],
+  ["Victory-Castle", "Victoria-Castillo"],
+  ["Victory-Shelter", "Victoria-Refugio"],
+  ["Treasure-Reaction", "Tesoro-Reacción"],
+  ["Treasure-Reserve", "Tesoro-Reserva"],
+  ["Treasure-Prize", "Tesoro-Premio"],
+  ["Treasure-Attack", "Tesoro-Ataque"],
+  ["Treasure-Victory", "Tesoro-Victoria"],
+  ["Reaction-Shelter", "Reacción-Refugio"],
+  ["Victory card", "carta de Victoria"],
+  ["Action card", "carta de Acción"],
+  ["Treasure card", "carta de Tesoro"],
+  ["Attack card", "carta de Ataque"],
+  ["Victory cards", "cartas de Victoria"],
+  ["Action cards", "cartas de Acción"],
+  ["Treasure cards", "cartas de Tesoro"],
+  ["Attack cards", "cartas de Ataque"],
+  ["Reserve", "Reserva"],
+  ["Duration", "Duración"],
+  ["Reaction", "Reacción"],
+  ["Gathering", "Reunión"],
+  ["Traveller", "Viajero"],
+  ["Shelter", "Refugio"],
+  ["Castle", "Castillo"],
+  ["Prize", "Premio"],
+  ["Knight", "Caballero"],
+  ["Looter", "Saqueador"],
+  ["Page", "Paje"],
+  ["Peasant", "Campesino"],
+  ["Event", "Evento"],
+  ["Landmark", "Monumento"],
+  ["Ruins", "Ruinas"],
+];
+
+const CARD_NAMES: [string, string][] = [
+  ["Copper", "Cobre"],
+  ["Silver", "Plata"],
+  ["Gold", "Oro"],
+  ["Estate", "Finca"],
+  ["Duchy", "Ducado"],
+  ["Province", "Provincia"],
+  ["Curse", "Maldición"],
+  ["Potion", "Poción"],
+  ["Platinum", "Platino"],
+  ["Colony", "Colonia"],
+  ["Spoils", "Botín"],
+  ["Madman", "Loco"],
+  ["Mercenary", "Mercenario"],
+  ["Champion", "Campeón"],
+  ["Teacher", "Maestro"],
+  ["Disciple", "Discípulo"],
+  ["Hero", "Héroe"],
+  ["Warrior", "Guerrero"],
+];
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function applyPhrases(
+  text: string,
+  phrases: [string, string][],
+  caseSensitive = false,
+): string {
+  let result = text;
+  for (const [from, to] of phrases) {
+    const flags = caseSensitive ? "g" : "gi";
+    const escaped = escapeRegex(from);
+    const regex = new RegExp(escaped, flags);
+    result = result.replace(regex, to);
   }
+  return result;
+}
+
+export function translateCardText(text: string): string {
+  let result = text
+    .replace(/\\n/g, "\n")
+    .replace(/\\d/g, "\n—\n");
+
+  result = applyPhrases(result, PHRASES);
+  result = applyPhrases(result, TYPES);
+  result = applyPhrases(result, CARD_NAMES);
+
+  // Word-level catch-all for remaining common words
+  result = result.replace(/\bdiscard(s|ed)?\b/gi, "descarta");
+  result = result.replace(/\bhand(s)?\b/gi, "mano");
+  result = result.replace(/\bdeck(s)?\b/gi, "mazo");
+  result = result.replace(/\bturn(s)?\b/gi, "turno");
+  result = result.replace(/\bcoin\b/gi, "moneda");
+  result = result.replace(/\bcoins\b/gi, "monedas");
+
+  // Plural vs singular
+  result = result.replace(/\bcard(s?)\b/gi, (_, s) =>
+    s ? "cartas" : "carta",
+  );
+
+  // +/- structured syntax
+  result = result.replace(
+    /\+(1) Card\(s?\)/gi, "+$1 Carta",
+  );
+  result = result.replace(
+    /\+(1) Card(s)?\b/gi, "+$1 Carta",
+  );
+  result = result.replace(
+    /\+(2|\d+) Card(s)?\b/gi, "+$1 Cartas",
+  );
+  result = result.replace(
+    /\+(1) Action\(s?\)/gi, "+$1 Acción",
+  );
+  result = result.replace(
+    /\+(1) Action(s)?\b/gi, "+$1 Acción",
+  );
+  result = result.replace(
+    /\+(2|\d+) Action(s)?\b/gi, "+$1 Acciones",
+  );
+  result = result.replace(
+    /\+(1) Buy\(s?\)/gi, "+$1 Compra",
+  );
+  result = result.replace(
+    /\+(1) Buy(s)?\b/gi, "+$1 Compra",
+  );
+  result = result.replace(
+    /\+(2|\d+) Buy(s)?\b/gi, "+$1 Compras",
+  );
+  result = result.replace(/\+(1)VP\b/gi, "+$1 PV");
+  result = result.replace(/\+(2|\d+)VP\b/gi, "+$1 PV");
+  result = result.replace(
+    /\+(1) Victory\b/gi, "+$1 Victoria",
+  );
+  result = result.replace(
+    /\+(2|\d+) Victory\b/gi, "+$1 Victorias",
+  );
+
+  // Card(s) parenthetical notation
+  result = result.replace(
+    /\bCard\(s?\)\b/gi, "Carta",
+  );
+
   return result;
 }
