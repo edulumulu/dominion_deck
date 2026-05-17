@@ -110,7 +110,7 @@ function App() {
               }}
             />
             <div>
-              <div className="exp-name">{exp.name}</div>
+              <div className="exp-name">{exp.name_es}</div>
               <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                 {exp.adds_extra_cards && (
                   <span className="badge badge-extra">+cartas</span>
@@ -154,7 +154,7 @@ function App() {
                   <img
                     className="card-img"
                     src={getCardImageUrl(card.card_name)}
-                    alt={card.card_name}
+                    alt={card.card_name_es || card.card_name}
                     loading="lazy"
                   />
                 </div>
@@ -166,11 +166,11 @@ function App() {
                         __html: getExpansionSymbol(card.set_name),
                       }}
                     />
-                    <span className="card-name">{card.card_name}</span>
+                    <span className="card-name">{card.card_name_es || card.card_name}</span>
                     <span className="card-cost">{card.cost}</span>
                   </div>
                   <div className="card-meta">
-                    <span className="badge badge-set">{card.set_name}</span>
+                    <span className="badge badge-set">{card.set_name_es || card.set_name}</span>
                     <span className="badge badge-type">{card.type}</span>
                   </div>
                   <div className="card-text">

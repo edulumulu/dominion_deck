@@ -7,6 +7,7 @@ class Expansion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
+    name_es = Column(String, default="")
     adds_extra_cards = Column(Boolean, default=False)
     extra_cards_description = Column(Text, default="")
     adds_events = Column(Boolean, default=False)
@@ -21,7 +22,9 @@ class Card(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     card_name = Column(String, nullable=False)
+    card_name_es = Column(String, default="")
     set_name = Column(String, nullable=False)
+    set_name_es = Column(String, default="")
     type = Column(String, nullable=False)
     is_kingdom_card = Column(Boolean, default=True)
     cost = Column(String, nullable=False)

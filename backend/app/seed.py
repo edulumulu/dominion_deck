@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import SessionLocal, engine, Base
 from app.models import Card, Expansion
+from app.translations import CARD_TRANSLATIONS, EXPANSION_TRANSLATIONS
 
 EXPANSION_METADATA = {
     "Dominion": {
@@ -157,9 +158,13 @@ def seed_database():
         with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                eng_name = row["card_name"]
+                eng_set = row["set_name"]
                 card = Card(
-                    card_name=row["card_name"],
-                    set_name=row["set_name"],
+                    card_name=eng_name,
+                    card_name_es=CARD_TRANSLATIONS.get(eng_name, eng_name),
+                    set_name=eng_set,
+                    set_name_es=EXPANSION_TRANSLATIONS.get(eng_set, eng_set),
                     type=row["type"],
                     is_kingdom_card=row["is_kingdom_card"].strip() == "1",
                     cost=row["cost"],
@@ -170,6 +175,7 @@ def seed_database():
         for name, meta in EXPANSION_METADATA.items():
             exp = Expansion(
                 name=name,
+                name_es=EXPANSION_TRANSLATIONS.get(name, name),
                 adds_extra_cards=meta["adds_extra_cards"],
                 extra_cards_description=meta["extra_cards_description"],
                 adds_events=meta["adds_events"],

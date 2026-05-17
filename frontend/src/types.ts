@@ -1,6 +1,7 @@
 export interface Expansion {
   id: number;
   name: string;
+  name_es: string;
   adds_extra_cards: boolean;
   extra_cards_description: string;
   adds_events: boolean;
@@ -13,7 +14,9 @@ export interface Expansion {
 export interface Card {
   id: number;
   card_name: string;
+  card_name_es: string;
   set_name: string;
+  set_name_es: string;
   type: string;
   is_kingdom_card: boolean;
   cost: string;

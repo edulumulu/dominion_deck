@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ExpansionOut(BaseModel):
     id: int
     name: str
+    name_es: str
     adds_extra_cards: bool
     extra_cards_description: str
     adds_events: bool
@@ -18,7 +19,9 @@ class ExpansionOut(BaseModel):
 class CardOut(BaseModel):
     id: int
     card_name: str
+    card_name_es: str
     set_name: str
+    set_name_es: str
     type: str
     is_kingdom_card: bool
     cost: str
