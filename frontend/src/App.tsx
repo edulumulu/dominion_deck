@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { fetchExpansions, fetchRandomCards } from "./api";
 import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
+import { translateCardText } from "./translate-card-text";
 import type { Expansion, Card, RandomCardsResponse } from "./types";
 
 function App() {
@@ -167,16 +168,14 @@ function App() {
                       }}
                     />
                     <span className="card-name">{card.card_name_es || card.card_name}</span>
-                    <span className="card-cost">{card.cost}</span>
+                    <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
                   </div>
                   <div className="card-meta">
                     <span className="badge badge-set">{card.set_name_es || card.set_name}</span>
                     <span className="badge badge-type">{card.type}</span>
                   </div>
                   <div className="card-text">
-                    {card.card_text
-                      .replace(/\\n/g, "\n")
-                      .replace(/\\d/g, "\n—\n")}
+                    {translateCardText(card.card_text)}
                   </div>
                 </div>
               </div>
