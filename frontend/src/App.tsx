@@ -67,6 +67,10 @@ function App() {
   const t = (key: string) => UI[lang][key] ?? key;
 
   useEffect(() => {
+    document.documentElement.classList.toggle("light", !dark);
+  }, [dark]);
+
+  useEffect(() => {
     fetchExpansions()
       .then((data) => {
         const exps = data.filter(
