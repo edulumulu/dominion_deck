@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchExpansions, fetchRandomCards } from "./api";
+import { getExpansionSymbol } from "./expansion-symbols";
+import { getCardImageUrl } from "./card-images";
 import type { Expansion, Card, RandomCardsResponse } from "./types";
 
 function App() {
@@ -101,6 +103,12 @@ function App() {
               checked={selected.has(exp.name)}
               onChange={() => {}}
             />
+            <span
+              className="expansion-symbol"
+              dangerouslySetInnerHTML={{
+                __html: getExpansionSymbol(exp.name),
+              }}
+            />
             <div>
               <div className="exp-name">{exp.name}</div>
               <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
@@ -142,18 +150,34 @@ function App() {
           <div className="card-grid">
             {result.cards.map((card: Card) => (
               <div key={card.id} className="card-item">
-                <div className="card-header">
-                  <span className="card-name">{card.card_name}</span>
-                  <span className="card-cost">{card.cost}</span>
+                <div className="card-img-wrap">
+                  <img
+                    className="card-img"
+                    src={getCardImageUrl(card.card_name)}
+                    alt={card.card_name}
+                    loading="lazy"
+                  />
                 </div>
-                <div className="card-meta">
-                  <span className="badge badge-set">{card.set_name}</span>
-                  <span className="badge badge-type">{card.type}</span>
-                </div>
-                <div className="card-text">
-                  {card.card_text
-                    .replace(/\\n/g, "\n")
-                    .replace(/\\d/g, "\n—\n")}
+                <div className="card-body">
+                  <div className="card-header">
+                    <span
+                      className="expansion-symbol card-symbol"
+                      dangerouslySetInnerHTML={{
+                        __html: getExpansionSymbol(card.set_name),
+                      }}
+                    />
+                    <span className="card-name">{card.card_name}</span>
+                    <span className="card-cost">{card.cost}</span>
+                  </div>
+                  <div className="card-meta">
+                    <span className="badge badge-set">{card.set_name}</span>
+                    <span className="badge badge-type">{card.type}</span>
+                  </div>
+                  <div className="card-text">
+                    {card.card_text
+                      .replace(/\\n/g, "\n")
+                      .replace(/\\d/g, "\n—\n")}
+                  </div>
                 </div>
               </div>
             ))}
