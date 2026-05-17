@@ -61,7 +61,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RandomCardsResponse | null>(null);
   const [error, setError] = useState("");
-  const [dark, setDark] = useState(() => localStorage.getItem("theme") !== "light");
+  const [dark, setDark] = useState(() => {
+    const isDark = localStorage.getItem("theme") !== "light";
+    document.documentElement.classList.toggle("light", !isDark);
+    return isDark;
+  });
   const [listView, setListView] = useState(false);
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "es");
   const t = (key: string) => UI[lang][key] ?? key;
