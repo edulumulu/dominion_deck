@@ -121,53 +121,53 @@ function App() {
 
   return (
     <div className={`app${dark ? "" : " light"}`}>
+      <div className="header">
+        <div>
+          <h1>{t("title")}</h1>
+          <p className="subtitle">
+            {t("subtitle")}
+          </p>
+        </div>
+        <div className="header-toggles">
+          <button
+            className={`icon-btn${result && !loading ? ` active` : ""}`}
+            onClick={() => setListView((p) => !p)}
+            title={listView ? t("grid_view") : t("list_view")}
+            disabled={!result || loading}
+          >
+            {listView ? "▦" : "☰"}
+          </button>
+          <button
+            className={`icon-btn lang-btn ${lang === "en" ? "active" : ""}`}
+            onClick={() =>
+              setLang((p) => {
+                const next: Lang = p === "es" ? "en" : "es";
+                localStorage.setItem("lang", next);
+                return next;
+              })
+            }
+            title={lang === "es" ? t("lang_en") : t("lang_es")}
+          >
+            {lang === "es" ? "EN" : "ES"}
+          </button>
+          <button
+            className={`icon-btn${dark ? "" : " active"}`}
+            onClick={() => {
+              setDark((p) => {
+                const next = !p;
+                localStorage.setItem("theme", next ? "dark" : "light");
+                return next;
+              });
+            }}
+            title={dark ? t("light_mode") : t("dark_mode")}
+          >
+            {dark ? "☀" : "☾"}
+          </button>
+        </div>
+      </div>
+
       <div className="app-layout">
         <div className="app-main">
-          <div className="header">
-            <div>
-              <h1>{t("title")}</h1>
-              <p className="subtitle">
-                {t("subtitle")}
-              </p>
-            </div>
-            <div className="header-toggles">
-              <button
-                className={`icon-btn${result && !loading ? ` active` : ""}`}
-                onClick={() => setListView((p) => !p)}
-                title={listView ? t("grid_view") : t("list_view")}
-                disabled={!result || loading}
-              >
-                {listView ? "▦" : "☰"}
-              </button>
-              <button
-                className={`icon-btn lang-btn ${lang === "en" ? "active" : ""}`}
-                onClick={() =>
-                  setLang((p) => {
-                    const next: Lang = p === "es" ? "en" : "es";
-                    localStorage.setItem("lang", next);
-                    return next;
-                  })
-                }
-                title={lang === "es" ? t("lang_en") : t("lang_es")}
-              >
-                {lang === "es" ? "EN" : "ES"}
-              </button>
-              <button
-                className={`icon-btn${dark ? "" : " active"}`}
-                onClick={() => {
-                  setDark((p) => {
-                    const next = !p;
-                    localStorage.setItem("theme", next ? "dark" : "light");
-                    return next;
-                  });
-                }}
-                title={dark ? t("light_mode") : t("dark_mode")}
-              >
-                {dark ? "☀" : "☾"}
-              </button>
-            </div>
-          </div>
-
           <div className="controls">
             <button className="btn btn-secondary" onClick={selectAll}>
               {t("select_all")}
