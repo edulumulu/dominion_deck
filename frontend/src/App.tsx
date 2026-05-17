@@ -3,6 +3,8 @@ import { fetchExpansions, fetchRandomCards } from "./api";
 import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
 import { translateCardText } from "./translate-card-text";
+import CardSearchSidebar from "./components/CardSearchSidebar";
+import CardDetailModal from "./components/CardDetailModal";
 import type { Expansion, Card, RandomCardsResponse } from "./types";
 
 type Lang = "es" | "en";
@@ -61,13 +63,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RandomCardsResponse | null>(null);
   const [error, setError] = useState("");
-  const [dark, setDark] = useState(() => {
-    const isDark = localStorage.getItem("theme") !== "light";
-    document.documentElement.classList.toggle("light", !isDark);
-    return isDark;
-  });
+  const [dark, setDark] = useState(() => localStorage.getItem("theme") !== "light");
   const [listView, setListView] = useState(false);
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "es");
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+
   const t = (key: string) => UI[lang][key] ?? key;
 
   useEffect(() => {
@@ -121,177 +121,191 @@ function App() {
 
   return (
     <div className={`app${dark ? "" : " light"}`}>
-      <div className="header">
-        <div>
-          <h1>{t("title")}</h1>
-          <p className="subtitle">
-            {t("subtitle")}
-          </p>
-        </div>
-        <div className="header-toggles">
-          <button
-            className={`icon-btn${result && !loading ? ` active` : ""}`}
-            onClick={() => setListView((p) => !p)}
-            title={listView ? t("grid_view") : t("list_view")}
-            disabled={!result || loading}
-          >
-            {listView ? "▦" : "☰"}
-          </button>
-          <button
-            className={`icon-btn lang-btn ${lang === "en" ? "active" : ""}`}
-            onClick={() =>
-              setLang((p) => {
-                const next: Lang = p === "es" ? "en" : "es";
-                localStorage.setItem("lang", next);
-                return next;
-              })
-            }
-            title={lang === "es" ? t("lang_en") : t("lang_es")}
-          >
-            {lang === "es" ? "EN" : "ES"}
-          </button>
-          <button
-            className={`icon-btn${dark ? "" : " active"}`}
-            onClick={() => {
-              setDark((p) => {
-                const next = !p;
-                localStorage.setItem("theme", next ? "dark" : "light");
-                return next;
-              });
-            }}
-            title={dark ? t("light_mode") : t("dark_mode")}
-          >
-            {dark ? "☀" : "☾"}
-          </button>
-        </div>
-      </div>
-
-      <div className="controls">
-        <button className="btn btn-secondary" onClick={selectAll}>
-          {t("select_all")}
-        </button>
-        <button className="btn btn-secondary" onClick={clearAll}>
-          {t("clear")}
-        </button>
-        <span className="badge badge-count">{t("count")}</span>
-        <button
-          className="btn btn-primary"
-          onClick={generate}
-          disabled={loading || selected.size === 0}
-        >
-          {loading ? t("generating") : t("generate")}
-        </button>
-      </div>
-
-      <div className="expansion-grid">
-        {expansions.map((exp) => (
-          <div
-            key={exp.name}
-            className={`expansion-card ${selected.has(exp.name) ? "selected" : ""}`}
-            onClick={() => toggle(exp.name)}
-          >
-            <input
-              type="checkbox"
-              checked={selected.has(exp.name)}
-              onChange={() => {}}
-            />
-            <span
-              className="expansion-symbol"
-              dangerouslySetInnerHTML={{
-                __html: getExpansionSymbol(exp.name),
-              }}
-            />
+      <div className="app-layout">
+        <div className="app-main">
+          <div className="header">
             <div>
-              <div className="exp-name">
-                {lang === "es" ? exp.name_es : exp.name}
-              </div>
-              <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                {exp.adds_extra_cards && (
-                  <span className="badge badge-extra">+cartas</span>
-                )}
-                {exp.modifies_starting_deck && (
-                  <span className="badge badge-start">+inicio</span>
-                )}
-                {exp.adds_events && (
-                  <span className="badge badge-event">events</span>
-                )}
-                {exp.adds_landmarks && (
-                  <span className="badge badge-event">landmarks</span>
-                )}
-              </div>
+              <h1>{t("title")}</h1>
+              <p className="subtitle">
+                {t("subtitle")}
+              </p>
+            </div>
+            <div className="header-toggles">
+              <button
+                className={`icon-btn${result && !loading ? ` active` : ""}`}
+                onClick={() => setListView((p) => !p)}
+                title={listView ? t("grid_view") : t("list_view")}
+                disabled={!result || loading}
+              >
+                {listView ? "▦" : "☰"}
+              </button>
+              <button
+                className={`icon-btn lang-btn ${lang === "en" ? "active" : ""}`}
+                onClick={() =>
+                  setLang((p) => {
+                    const next: Lang = p === "es" ? "en" : "es";
+                    localStorage.setItem("lang", next);
+                    return next;
+                  })
+                }
+                title={lang === "es" ? t("lang_en") : t("lang_es")}
+              >
+                {lang === "es" ? "EN" : "ES"}
+              </button>
+              <button
+                className={`icon-btn${dark ? "" : " active"}`}
+                onClick={() => {
+                  setDark((p) => {
+                    const next = !p;
+                    localStorage.setItem("theme", next ? "dark" : "light");
+                    return next;
+                  });
+                }}
+                title={dark ? t("light_mode") : t("dark_mode")}
+              >
+                {dark ? "☀" : "☾"}
+              </button>
             </div>
           </div>
-        ))}
-      </div>
 
-      {error && <div className="error">{error}</div>}
+          <div className="controls">
+            <button className="btn btn-secondary" onClick={selectAll}>
+              {t("select_all")}
+            </button>
+            <button className="btn btn-secondary" onClick={clearAll}>
+              {t("clear")}
+            </button>
+            <span className="badge badge-count">{t("count")}</span>
+            <button
+              className="btn btn-primary"
+              onClick={generate}
+              disabled={loading || selected.size === 0}
+            >
+              {loading ? t("generating") : t("generate")}
+            </button>
+          </div>
 
-      {loading && <div className="loading">{t("loading")}</div>}
-
-      {result && !loading && (
-        <>
-          {result.special_rules.length > 0 && (
-            <div className="special-rules">
-              <h3>{t("special_rules")}</h3>
-              <ul>
-                {result.special_rules.map((rule, i) => (
-                  <li key={i}>{rule}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className={listView ? "card-list" : "card-grid"}>
-            {result.cards.map((card: Card) => (
-              <div key={card.id} className="card-item">
-                <div className="card-img-wrap">
-                  <img
-                    className="card-img"
-                    src={getCardImageUrl(card.card_name)}
-                    alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="card-body">
-                  <div className="card-header">
-                    <span
-                      className="expansion-symbol card-symbol"
-                      dangerouslySetInnerHTML={{
-                        __html: getExpansionSymbol(card.set_name),
-                      }}
-                    />
-                    <span className="card-name">
-                      {lang === "es"
-                        ? (card.card_name_es || card.card_name)
-                        : card.card_name}
-                    </span>
-                    <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
+          <div className="expansion-grid">
+            {expansions.map((exp) => (
+              <div
+                key={exp.name}
+                className={`expansion-card ${selected.has(exp.name) ? "selected" : ""}`}
+                onClick={() => toggle(exp.name)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.has(exp.name)}
+                  onChange={() => {}}
+                />
+                <span
+                  className="expansion-symbol"
+                  dangerouslySetInnerHTML={{
+                    __html: getExpansionSymbol(exp.name),
+                  }}
+                />
+                <div>
+                  <div className="exp-name">
+                    {lang === "es" ? exp.name_es : exp.name}
                   </div>
-                  <div className="card-meta">
-                    <span className="badge badge-set">
-                      {lang === "es"
-                        ? (card.set_name_es || card.set_name)
-                        : card.set_name}
-                    </span>
-                    <span className="badge badge-type">{card.type}</span>
-                  </div>
-                  <div className="card-text">
-                    {lang === "es"
-                      ? translateCardText(card.card_text)
-                      : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
+                  <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+                    {exp.adds_extra_cards && (
+                      <span className="badge badge-extra">+cartas</span>
+                    )}
+                    {exp.modifies_starting_deck && (
+                      <span className="badge badge-start">+inicio</span>
+                    )}
+                    {exp.adds_events && (
+                      <span className="badge badge-event">events</span>
+                    )}
+                    {exp.adds_landmarks && (
+                      <span className="badge badge-event">landmarks</span>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </>
-      )}
 
-      {!result && !loading && !error && (
-        <div className="empty-state">
-          <h3>{t("empty_title")}</h3>
-          <p>{t("empty_desc")}</p>
+          {error && <div className="error">{error}</div>}
+
+          {loading && <div className="loading">{t("loading")}</div>}
+
+          {result && !loading && (
+            <>
+              {result.special_rules.length > 0 && (
+                <div className="special-rules">
+                  <h3>{t("special_rules")}</h3>
+                  <ul>
+                    {result.special_rules.map((rule, i) => (
+                      <li key={i}>{rule}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className={listView ? "card-list" : "card-grid"}>
+                {result.cards.map((card: Card) => (
+                  <div key={card.id} className="card-item">
+                    <div className="card-img-wrap">
+                      <img
+                        className="card-img"
+                        src={getCardImageUrl(card.card_name)}
+                        alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="card-body">
+                      <div className="card-header">
+                        <span
+                          className="expansion-symbol card-symbol"
+                          dangerouslySetInnerHTML={{
+                            __html: getExpansionSymbol(card.set_name),
+                          }}
+                        />
+                        <span className="card-name">
+                          {lang === "es"
+                            ? (card.card_name_es || card.card_name)
+                            : card.card_name}
+                        </span>
+                        <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
+                      </div>
+                      <div className="card-meta">
+                        <span className="badge badge-set">
+                          {lang === "es"
+                            ? (card.set_name_es || card.set_name)
+                            : card.set_name}
+                        </span>
+                        <span className="badge badge-type">{card.type}</span>
+                      </div>
+                      <div className="card-text">
+                        {lang === "es"
+                          ? translateCardText(card.card_text)
+                          : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {!result && !loading && !error && (
+            <div className="empty-state">
+              <h3>{t("empty_title")}</h3>
+              <p>{t("empty_desc")}</p>
+            </div>
+          )}
         </div>
+
+        <CardSearchSidebar lang={lang} onSelectCard={setSelectedCard} />
+      </div>
+
+      {selectedCard && (
+        <CardDetailModal
+          card={selectedCard}
+          lang={lang}
+          onClose={() => setSelectedCard(null)}
+        />
       )}
     </div>
   );

@@ -1,3 +1,5 @@
+import type { Card } from "./types";
+
 const API_BASE = "";
 
 export async function fetchExpansions() {
@@ -16,5 +18,11 @@ export async function fetchRandomCards(expansions: string[], count = 10) {
     const err = await res.json();
     throw new Error(err.detail || "Failed to fetch cards");
   }
+  return res.json();
+}
+
+export async function fetchAllCards(): Promise<Card[]> {
+  const res = await fetch(`${API_BASE}/api/cards?kingdom_only=false`);
+  if (!res.ok) throw new Error("Failed to fetch cards");
   return res.json();
 }
