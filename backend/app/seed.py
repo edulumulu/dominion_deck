@@ -1,0 +1,189 @@
+import csv
+import os
+
+from sqlalchemy.orm import Session
+
+from app.database import SessionLocal, engine, Base
+from app.models import Card, Expansion
+
+EXPANSION_METADATA = {
+    "Dominion": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Expansión base. 25 cartas de Reino.",
+    },
+    "Intrigue": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "",
+    },
+    "Seaside": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Introduce cartas Duration (se quedan en juego entre turnos).",
+    },
+    "Alchemy": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Añade la carta Potion al suministro como Treasure especial para costes con poción.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Los costes incluyen Þ (Potion). Requiere tener Potion en el suministro.",
+    },
+    "Prosperity": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Añade Platinum ($9, vale $5) y Colony (10VP) al suministro.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Expansión de lujo. Añade cartas de alto coste.",
+    },
+    "Cornucopia": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Young Witch requiere un 11º mazo de Reino (Bane card) de coste $2-$3.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Incluye cartas Prize (fuera del suministro).",
+    },
+    "Hinterlands": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Cartas con efectos al ganarlas.",
+    },
+    "Dark Ages": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Reemplaza los Estates iniciales por Shelters (Necropolis, Hovel, Overgrown Estate). Añade Ruins y Spoils.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": True,
+        "modifies_starting_description": "Cada jugador empieza con Necropolis, Hovel, Overgrown Estate en vez de 3 Estates.",
+        "notes": "Introduce cartas Looter, Ruins, Shelter, Knight, Spoils.",
+    },
+    "Guilds": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Introduce Coin tokens y la mecánica de overpay (pagar de más).",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Varias cartas tienen coste X+ (se puede pagar más de su coste base para obtener efectos extra).",
+    },
+    "Adventures": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Añade Events (cartas especiales que se compran como una acción). Introduce Tavern mat y Reserve tokens.",
+        "adds_events": True,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Incluye cartas Reserve, Duration, Traveller, y Event tokens.",
+    },
+    "Empires": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Añade Events, Landmarks, y split piles (2 cartas diferentes en un mismo mazo). Introduce Debt tokens.",
+        "adds_events": True,
+        "adds_landmarks": True,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Los split piles contienen 5 de una carta encima y 5 de otra debajo.",
+    },
+    "Promo": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Cartas promocionales.",
+    },
+    "Nocturne": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Introduce cartas Night, Heirlooms (reemplazan Coppers iniciales), y States.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": True,
+        "modifies_starting_description": "Algunas cartas reemplazan los Coppers iniciales por Heirlooms.",
+        "notes": "Incluye cartas Night (se juegan después de la Buy phase), States, y Boons/Hexes.",
+    },
+    "Renaissance": {
+        "adds_extra_cards": True,
+        "extra_cards_description": "Introduce Projects (mejoras permanentes que se compran) y Artifacts.",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Incluye cartas Coffers y Villagers.",
+    },
+    "Base Cards": {
+        "adds_extra_cards": False,
+        "extra_cards_description": "",
+        "adds_events": False,
+        "adds_landmarks": False,
+        "modifies_starting_deck": False,
+        "modifies_starting_description": "",
+        "notes": "Cartas base del juego (Copper, Silver, Gold, Estate, Duchy, Province, Curse, etc.)",
+    },
+}
+
+
+def seed_database():
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        existing = db.query(Card).count()
+        if existing > 0:
+            return
+
+        csv_path = os.path.join(os.path.dirname(__file__), "..", "dominion_cards.csv")
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                card = Card(
+                    card_name=row["card_name"],
+                    set_name=row["set_name"],
+                    type=row["type"],
+                    is_kingdom_card=row["is_kingdom_card"].strip() == "1",
+                    cost=row["cost"],
+                    card_text=row["card_text"],
+                )
+                db.add(card)
+
+        for name, meta in EXPANSION_METADATA.items():
+            exp = Expansion(
+                name=name,
+                adds_extra_cards=meta["adds_extra_cards"],
+                extra_cards_description=meta["extra_cards_description"],
+                adds_events=meta["adds_events"],
+                adds_landmarks=meta["adds_landmarks"],
+                modifies_starting_deck=meta["modifies_starting_deck"],
+                modifies_starting_description=meta["modifies_starting_description"],
+                notes=meta["notes"],
+            )
+            db.add(exp)
+
+        db.commit()
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    seed_database()

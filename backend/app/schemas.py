@@ -1,0 +1,33 @@
+from pydantic import BaseModel
+
+
+class ExpansionOut(BaseModel):
+    id: int
+    name: str
+    adds_extra_cards: bool
+    extra_cards_description: str
+    adds_events: bool
+    adds_landmarks: bool
+    modifies_starting_deck: bool
+    modifies_starting_description: str
+    notes: str
+
+    model_config = {"from_attributes": True}
+
+
+class CardOut(BaseModel):
+    id: int
+    card_name: str
+    set_name: str
+    type: str
+    is_kingdom_card: bool
+    cost: str
+    card_text: str
+
+    model_config = {"from_attributes": True}
+
+
+class RandomCardsResponse(BaseModel):
+    cards: list[CardOut]
+    active_expansions: list[str]
+    special_rules: list[str]
