@@ -549,6 +549,7 @@ function App() {
             lang={lang}
             selectedCardIds={manualCardIds}
             onToggleCard={toggleManualCard}
+            disabled={hasAutoDeck}
           />
         </div>
       </div>

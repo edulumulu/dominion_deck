@@ -7,6 +7,7 @@ interface Props {
   lang: "es" | "en";
   selectedCardIds: Set<number>;
   onToggleCard: (card: Card) => void;
+  disabled?: boolean;
 }
 
 interface ExpGroup {
@@ -15,7 +16,7 @@ interface ExpGroup {
   cards: Card[];
 }
 
-export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard }: Props) {
+export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard, disabled }: Props) {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkedExps, setCheckedExps] = useState<Set<string>>(new Set());
@@ -49,6 +50,7 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
   }, [cards, checkedExps]);
 
   const toggleExp = (name: string) => {
+    if (disabled) return;
     setCheckedExps((prev) => {
       const next = new Set(prev);
       if (next.has(name)) next.delete(name);
@@ -68,7 +70,7 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
   }, [cards]);
 
   return (
-    <div className="sidebar-right manual-selector">
+    <div className={`sidebar-right manual-selector${disabled ? " manual-selector-disabled" : ""}`}>
       <div className="manual-selector-header" onClick={() => setOpen((p) => !p)}>
         <span className={`manual-selector-arrow${open ? " open" : ""}`}>▶</span>
         <h3>{lang === "es" ? "Selección manual" : "Manual pick"}</h3>
@@ -102,7 +104,7 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
                   <div
                     key={card.id}
                     className={`sidebar-card-item${selectedCardIds.has(card.id) ? " selected" : ""}`}
-                    onClick={() => onToggleCard(card)}
+                    onClick={() => !disabled && onToggleCard(card)}
                   >
                     <img
                       className="sidebar-card-img"

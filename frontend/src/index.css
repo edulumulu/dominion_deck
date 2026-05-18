@@ -748,6 +748,11 @@ h1 {
   background: var(--surface2);
 }
 
+.manual-selector-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .manual-selector-header h3 {
   font-size: 0.85rem;
   color: var(--accent);
