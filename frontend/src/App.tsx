@@ -311,7 +311,7 @@ function App() {
               <div className="manual-deck-header">
                 <h3>{t("manual_deck")} ({manualCards.length}/10)</h3>
               </div>
-              <div className="card-grid">
+              <div className={listView ? "card-list" : "card-grid"}>
                 {manualCards.map((card: Card) => (
                   <div key={card.id} className="card-item manual-deck-card">
                     <button
@@ -370,7 +370,7 @@ function App() {
                       <h4 className="extra-pile-label">
                         {lang === "es" ? pile.pile_label_es : pile.pile_label}
                       </h4>
-                      <div className="card-grid extra-pile-cards">
+                      <div className={listView ? "card-list extra-pile-cards" : "card-grid extra-pile-cards"}>
                         {pile.cards.map((card: Card) => (
                           <div key={card.card_name} className="card-item">
                             <div className="card-img-wrap">
@@ -488,7 +488,7 @@ function App() {
                       <h4 className="extra-pile-label">
                         {lang === "es" ? pile.pile_label_es : pile.pile_label}
                       </h4>
-                      <div className="card-grid extra-pile-cards">
+                      <div className={listView ? "card-list extra-pile-cards" : "card-grid extra-pile-cards"}>
                         {pile.cards.map((card: Card) => (
                           <div key={card.id} className="card-item">
                             <div className="card-img-wrap">

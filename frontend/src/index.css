@@ -555,7 +555,33 @@ h1 {
   }
 
   .card-grid {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    grid-template-columns: none;
+  }
+
+  .card-grid .card-item {
+    flex-direction: row;
+  }
+
+  .card-grid .card-img-wrap {
+    width: 64px;
+    min-height: 96px;
+    flex-shrink: 0;
+    aspect-ratio: 5 / 8;
+  }
+
+  .card-grid .card-body {
+    flex: 1;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .card-grid .card-text {
+    font-size: 0.7rem;
+  }
+
+  .card-grid {
     gap: 0.5rem;
   }
 }
