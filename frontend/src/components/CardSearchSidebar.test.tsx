@@ -3,8 +3,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import CardSearchSidebar from "./CardSearchSidebar";
 
 const mockCards = [
-  { id: 1, card_name: "Witch", card_name_es: "Bruja", set_name: "Dominion", set_name_es: "Dominio", type: "Action-Attack", is_kingdom_card: true, cost: "5", card_text: "+2 Cards\n+1 Action" },
-  { id: 2, card_name: "Village", card_name_es: "Aldea", set_name: "Dominion", set_name_es: "Dominio", type: "Action", is_kingdom_card: true, cost: "3", card_text: "+1 Card\n+2 Actions" },
+  { id: 1, card_name: "Witch", card_name_es: "Bruja", set_name: "Dominion", set_name_es: "Dominio", type: "Action-Attack", is_kingdom_card: true, cost: "5", potion_cost: false, card_text: "+2 Cards\n+1 Action" },
+  { id: 2, card_name: "Village", card_name_es: "Aldea", set_name: "Dominion", set_name_es: "Dominio", type: "Action", is_kingdom_card: true, cost: "3", potion_cost: false, card_text: "+1 Card\n+2 Actions" },
 ];
 
 const onSelectCard = vi.fn();

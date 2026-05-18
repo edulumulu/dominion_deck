@@ -20,6 +20,7 @@ export interface Card {
   type: string;
   is_kingdom_card: boolean;
   cost: string;
+  potion_cost: boolean;
   card_text: string;
 }
 

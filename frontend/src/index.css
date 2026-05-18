@@ -436,6 +436,26 @@ h1 {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+.card-cost-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.potion-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.potion-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 .card-meta {
   display: flex;
   gap: 0.3rem;
