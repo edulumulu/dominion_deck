@@ -257,12 +257,6 @@ function App() {
                     </div>
                     <div className="card-body">
                       <div className="card-header">
-                        <span
-                          className="expansion-symbol card-symbol"
-                          dangerouslySetInnerHTML={{
-                            __html: getExpansionSymbol(card.set_name),
-                          }}
-                        />
                         <span className="card-name">
                           {lang === "es"
                             ? (card.card_name_es || card.card_name)
