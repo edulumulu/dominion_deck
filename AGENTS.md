@@ -12,6 +12,8 @@ Web app that generates random Dominion Kingdom card decks.
 | `npm run dev` | Vite HMR dev server on :5173 |
 | `npm run build` | `tsc -b && vite build` (typecheck + production bundle) |
 | `npm run lint` | ESLint |
+| `npm test` | vitest (unit + component tests) |
+| `npm run test:e2e` | Playwright E2E tests (Docker must be running on :80) |
 | `docker compose build --no-cache && docker compose up -d` | Full rebuild & restart |
 
 ## Architecture facts an agent will miss
@@ -22,7 +24,8 @@ Web app that generates random Dominion Kingdom card decks.
 - **Card images** come from `connorburt/dominion-cards` GitHub repo at 1260×2016 (5:8 ratio). URL built in `card-images.ts`. The CSS uses `object-fit: contain` and `aspect-ratio: 5 / 8`.
 - **DB is SQLite** inside the container at `/app/dominion.db`. No volume is mounted — it is destroyed on container recreate. Data auto-seeds from `backend/dominion_cards.csv` on first startup. To re-seed: rebuild the backend container.
 - **28 non-supply cards** (Ruins, Shelters, Prizes, Traveller upgrades, Spirits, Spoils, Madman, Mercenary) are forced `is_kingdom_card=0` by both the CSV data and a safety filter in `seed.py`.
-- **No test framework** exists. The only verification is `npm run build`.
+- **Unit/component tests**: vitest in `frontend/src/*.test.ts(x)`. Component tests use jsdom + RTL.
+- **E2E tests**: Playwright in `frontend/e2e/`. Requires Docker running on :80.
 - **API proxy**: nginx forwards `/api/` to `backend:8000`. In dev mode the Vite server does not proxy — you must call the backend directly.
 
 ## Git conventions
