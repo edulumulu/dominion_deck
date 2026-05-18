@@ -31,7 +31,14 @@ class CardOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ExtraPileOut(BaseModel):
+    pile_label: str
+    pile_label_es: str
+    cards: list[CardOut]
+
+
 class RandomCardsResponse(BaseModel):
     cards: list[CardOut]
     active_expansions: list[str]
     special_rules: list[str]
+    extra_piles: list[ExtraPileOut] = []

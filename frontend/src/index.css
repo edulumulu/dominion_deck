@@ -474,6 +474,45 @@ h1 {
   border: 1px solid var(--border);
 }
 
+/* ── Extra Piles ── */
+
+.extra-piles {
+  margin-top: 2rem;
+  border: 2px solid var(--accent2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: color-mix(in srgb, var(--accent2) 8%, var(--surface));
+}
+
+.extra-piles-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.extra-pile-group {
+  margin-bottom: 1.25rem;
+}
+
+.extra-pile-group:last-child {
+  margin-bottom: 0;
+}
+
+.extra-pile-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--accent);
+}
+
+.extra-pile-cards {
+  margin-bottom: 0;
+}
+
 .card-text {
   font-size: 0.7rem;
   color: var(--text-muted);
