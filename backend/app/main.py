@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Card, Expansion
-from app.schemas import CardOut, ExpansionOut, RandomCardsResponse
+from app.schemas import CardOut, ExpansionOut, ExtraPileOut, RandomCardsResponse
 from app.seed import seed_database
 
 app = FastAPI(title="Dominion Deck API")
@@ -113,8 +113,94 @@ def random_cards(
         if name in selected_names:
             special_rules.append(f"[{name}] {rule}")
 
+    EXTRA_PILES_CONFIG = [
+        {
+            "pile_label": "Colony & Platinum",
+            "pile_label_es": "Colonia y Platino",
+            "condition": "Prosperity" in exp_names,
+            "card_names": ["Colony", "Platinum"],
+        },
+        {
+            "pile_label": "Potion",
+            "pile_label_es": "Poción",
+            "condition": "Alchemy" in exp_names,
+            "card_names": ["Potion"],
+        },
+        {
+            "pile_label": "Ruins",
+            "pile_label_es": "Ruinas",
+            "condition": bool(selected_names & {"Cultist", "Marauder", "Death Cart"}),
+            "card_names": ["Abandoned Mine", "Ruined Library", "Ruined Market", "Ruined Village", "Survivors"],
+        },
+        {
+            "pile_label": "Spoils",
+            "pile_label_es": "Botín",
+            "condition": bool(selected_names & {"Marauder", "Bandit Camp", "Pillage"}),
+            "card_names": ["Spoils"],
+        },
+        {
+            "pile_label": "Madman",
+            "pile_label_es": "Loco",
+            "condition": "Hermit" in selected_names,
+            "card_names": ["Madman"],
+        },
+        {
+            "pile_label": "Mercenary",
+            "pile_label_es": "Mercenario",
+            "condition": "Urchin" in selected_names,
+            "card_names": ["Mercenary"],
+        },
+        {
+            "pile_label": "Prizes",
+            "pile_label_es": "Premios",
+            "condition": "Tournament" in selected_names,
+            "card_names": ["Bag of Gold", "Diadem", "Followers", "Princess", "Trusty Steed"],
+        },
+        {
+            "pile_label": "Wish",
+            "pile_label_es": "Deseo",
+            "condition": bool(selected_names & {"Leprechaun", "Magic Lamp"}),
+            "card_names": ["Wish"],
+        },
+        {
+            "pile_label": "Imp",
+            "pile_label_es": "Diablillo",
+            "condition": bool(selected_names & {"Devil's Workshop", "Tormentor"}),
+            "card_names": ["Imp"],
+        },
+        {
+            "pile_label": "Ghost",
+            "pile_label_es": "Fantasma",
+            "condition": bool(selected_names & {"Exorcist", "Haunted Mirror"}),
+            "card_names": ["Ghost"],
+        },
+        {
+            "pile_label": "Bat",
+            "pile_label_es": "Murciélago",
+            "condition": "Vampire" in selected_names,
+            "card_names": ["Bat"],
+        },
+    ]
+
+    extra_piles = []
+    for config in EXTRA_PILES_CONFIG:
+        if config["condition"]:
+            cards = (
+                db.query(Card)
+                .filter(Card.card_name.in_(config["card_names"]))
+                .all()
+            )
+            extra_piles.append(
+                ExtraPileOut(
+                    pile_label=config["pile_label"],
+                    pile_label_es=config["pile_label_es"],
+                    cards=[CardOut.model_validate(c) for c in cards],
+                )
+            )
+
     return RandomCardsResponse(
         cards=[CardOut.model_validate(c) for c in selected_cards],
         active_expansions=exp_names,
         special_rules=special_rules,
+        extra_piles=extra_piles,
     )

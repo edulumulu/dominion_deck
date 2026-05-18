@@ -24,8 +24,15 @@ export interface Card {
   card_text: string;
 }
 
+export interface ExtraPile {
+  pile_label: string;
+  pile_label_es: string;
+  cards: Card[];
+}
+
 export interface RandomCardsResponse {
   cards: Card[];
   active_expansions: string[];
   special_rules: string[];
+  extra_piles: ExtraPile[];
 }

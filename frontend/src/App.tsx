@@ -5,7 +5,7 @@ import { getCardImageUrl } from "./card-images";
 import { translateCardText } from "./translate-card-text";
 import CardSearchSidebar from "./components/CardSearchSidebar";
 import CardDetailModal from "./components/CardDetailModal";
-import type { Expansion, Card, RandomCardsResponse } from "./types";
+import type { Expansion, Card, ExtraPile, RandomCardsResponse } from "./types";
 
 type Lang = "es" | "en";
 
@@ -31,6 +31,8 @@ const UI: Record<Lang, Record<string, string>> = {
     dark_mode: "Modo oscuro",
     lang_en: "EN",
     lang_es: "ES",
+    potion_cost: "Requiere Poción",
+    extra_piles_title: "Mazos extra",
   },
   en: {
     title: "Dominion Deck",
@@ -54,6 +56,7 @@ const UI: Record<Lang, Record<string, string>> = {
     lang_en: "EN",
     lang_es: "ES",
     potion_cost: "Requires Potion",
+    extra_piles_title: "Extra Supply Piles",
   },
 };
 
@@ -292,6 +295,58 @@ function App() {
                   </div>
                 ))}
               </div>
+
+              {result.extra_piles.length > 0 && (
+                <div className="extra-piles">
+                  <h3 className="extra-piles-title">{t("extra_piles_title")}</h3>
+                  {result.extra_piles.map((pile: ExtraPile) => (
+                    <div key={pile.pile_label} className="extra-pile-group">
+                      <h4 className="extra-pile-label">
+                        {lang === "es" ? pile.pile_label_es : pile.pile_label}
+                      </h4>
+                      <div className="card-grid extra-pile-cards">
+                        {pile.cards.map((card: Card) => (
+                          <div key={card.id} className="card-item">
+                            <div className="card-img-wrap">
+                              <img
+                                className="card-img"
+                                src={getCardImageUrl(card.card_name)}
+                                alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="card-body">
+                              <div className="card-header">
+                                <span className="card-name">
+                                  {lang === "es"
+                                    ? (card.card_name_es || card.card_name)
+                                    : card.card_name}
+                                </span>
+                                <span className="card-cost-wrap">
+                                  <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
+                                </span>
+                              </div>
+                              <div className="card-meta">
+                                <span className="badge badge-set">
+                                  {lang === "es"
+                                    ? (card.set_name_es || card.set_name)
+                                    : card.set_name}
+                                </span>
+                                <span className="badge badge-type">{card.type}</span>
+                              </div>
+                              <div className="card-text">
+                                {lang === "es"
+                                  ? translateCardText(card.card_text)
+                                  : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           )}
 
