@@ -538,13 +538,50 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
+.empty-manual-hint {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--accent2);
+  font-weight: 500;
+}
+
+.btn-reset {
+  margin-left: auto;
+}
+
 @media (max-width: 640px) {
   .expansion-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 
   .card-grid {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    grid-template-columns: none;
+  }
+
+  .card-grid .card-item {
+    flex-direction: row;
+  }
+
+  .card-grid .card-img-wrap {
+    width: 64px;
+    min-height: 96px;
+    flex-shrink: 0;
+    aspect-ratio: 5 / 8;
+  }
+
+  .card-grid .card-body {
+    flex: 1;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .card-grid .card-text {
+    font-size: 0.7rem;
+  }
+
+  .card-grid {
     gap: 0.5rem;
   }
 }
@@ -562,6 +599,25 @@ h1 {
   min-width: 0;
 }
 
+/* ── Sidebar column (search + manual selector) ── */
+
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.sidebar-col .sidebar-right {
+  width: 100%;
+}
+
 /* ── Right sidebar ── */
 
 .sidebar-right {
@@ -572,9 +628,6 @@ h1 {
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 2rem);
-  position: sticky;
-  top: 1rem;
 }
 
 .sidebar-header {
@@ -669,6 +722,148 @@ h1 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ── Manual Card Selector ── */
+
+.manual-selector .sidebar-results {
+  max-height: 50vh;
+}
+
+.sidebar-card-item.selected {
+  background: var(--surface2);
+}
+
+.manual-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+.manual-selector-header:hover {
+  background: var(--surface2);
+}
+
+.manual-selector-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.manual-selector-header h3 {
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.manual-selector-arrow {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.manual-selector-arrow.open {
+  transform: rotate(90deg);
+}
+
+.manual-exp-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.1rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.manual-exp-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  color: var(--text-muted);
+  transition: color 0.12s;
+}
+
+.manual-exp-filter:hover {
+  color: var(--text);
+}
+
+.manual-exp-filter input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.manual-exp-section {
+  margin-bottom: 0.5rem;
+}
+
+.manual-exp-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0 0.2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.3rem;
+}
+
+/* ── Manual Deck in center ── */
+
+.manual-deck {
+  margin-bottom: 1.5rem;
+}
+
+.manual-deck-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.manual-deck-header h3 {
+  font-size: 0.9rem;
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+.manual-deck-card {
+  position: relative;
+}
+
+.card-list .manual-deck-card .card-body {
+  padding-right: 2.2rem;
+}
+
+.card-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  z-index: 2;
+  transition: background 0.12s;
+  line-height: 1;
+}
+
+.card-remove-btn:hover {
+  background: var(--red);
 }
 
 /* ── Modal ── */
@@ -774,6 +969,16 @@ h1 {
 @media (max-width: 860px) {
   .app-layout {
     flex-direction: column;
+  }
+
+  .sidebar-col {
+    width: 100%;
+  }
+
+  .sidebar-col .sidebar-right {
+    width: 100%;
+    max-height: none;
+    position: static;
   }
 
   .sidebar-right {
