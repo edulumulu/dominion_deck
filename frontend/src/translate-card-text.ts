@@ -23,6 +23,8 @@ const PHRASES: [string, string][] = [
   ["Draw until", "Roba hasta"],
   ["draw until", "roba hasta"],
   ["draw an extra card", "roba una carta extra"],
+  ["Draw a card", "Roba una carta"],
+  ["draw a card", "roba una carta"],
   ["after you finish drawing", "después de terminar de robar"],
   ["finish drawing", "terminar de robar"],
   ["as you draw them", "mientras las robas"],
@@ -350,25 +352,15 @@ export function translateCardText(text: string): string {
   result = applyPhrases(result, TYPES);
   result = applyPhrases(result, CARD_NAMES);
 
-  // Word-level catch-all for remaining common words
-  result = result.replace(/\bdiscard(s|ed)?\b/gi, "descarta");
-  result = result.replace(/\bhand(s)?\b/gi, "mano");
-  result = result.replace(/\bdeck(s)?\b/gi, "mazo");
-  result = result.replace(/\bturn(s)?\b/gi, "turno");
-  result = result.replace(/\bcoin\b/gi, "moneda");
-  result = result.replace(/\bcoins\b/gi, "monedas");
-
-  // Plural vs singular
-  result = result.replace(/\bcard(s?)\b/gi, (_, s) =>
-    s ? "cartas" : "carta",
-  );
-
-  // +/- structured syntax
+  // +/- structured syntax — must run before catch-all card/action/buy patterns
   result = result.replace(
     /\+(1) Card\(s?\)/gi, "+$1 Carta",
   );
   result = result.replace(
     /\+(1) Card(s)?\b/gi, "+$1 Carta",
+  );
+  result = result.replace(
+    /\+(2|\d+) Card\(s?\)/gi, "+$1 Cartas",
   );
   result = result.replace(
     /\+(2|\d+) Card(s)?\b/gi, "+$1 Cartas",
@@ -400,9 +392,22 @@ export function translateCardText(text: string): string {
     /\+(2|\d+) Victory\b/gi, "+$1 Victorias",
   );
 
-  // Card(s) parenthetical notation
+  // Card(s) parenthetical notation (before catch-all card replacement)
   result = result.replace(
     /\bCard\(s?\)\b/gi, "Carta",
+  );
+
+  // Word-level catch-all for remaining common words
+  result = result.replace(/\bdiscard(s|ed)?\b/gi, "descarta");
+  result = result.replace(/\bhand(s)?\b/gi, "mano");
+  result = result.replace(/\bdeck(s)?\b/gi, "mazo");
+  result = result.replace(/\bturn(s)?\b/gi, "turno");
+  result = result.replace(/\bcoin\b/gi, "moneda");
+  result = result.replace(/\bcoins\b/gi, "monedas");
+
+  // Plural vs singular (catch-all — must come last)
+  result = result.replace(/\bcard(s?)\b/gi, (_, s) =>
+    s ? "cartas" : "carta",
   );
 
   return result;

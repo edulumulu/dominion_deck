@@ -177,6 +177,7 @@ def seed_database():
                     type=card_type,
                     is_kingdom_card=is_kingdom,
                     cost=row["cost"],
+                    potion_cost=row.get("potion", "0").strip() == "1",
                     card_text=card_text,
                 )
                 db.add(card)

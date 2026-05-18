@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   pull_request:
     branches: [main]
@@ -42,5 +45,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose build --no-cache
-      - run: docker compose up -d
+      - run: docker compose up -d --wait
       - run: chmod +x healthcheck.sh && ./healthcheck.sh http://localhost

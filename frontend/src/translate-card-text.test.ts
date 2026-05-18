@@ -3,19 +3,19 @@ import { translateCardText } from "./translate-card-text";
 
 describe("translateCardText", () => {
   it('translates "Draw a card" at start of string', () => {
-    expect(translateCardText("Draw a card")).toBe("Draw a carta");
+    expect(translateCardText("Draw a card")).toBe("Roba una carta");
   });
 
   it('translates " Draw a card" with leading space', () => {
-    expect(translateCardText(" Draw a card")).toBe(" Roba a carta");
+    expect(translateCardText(" Draw a card")).toBe(" Roba una carta");
   });
 
-  it("handles +N Card(s) (catch-all lowercases Card first)", () => {
-    expect(translateCardText("+2 Card(s)")).toBe("+2 carta(s)");
+  it("handles +2 Card(s) to +2 Cartas", () => {
+    expect(translateCardText("+2 Card(s)")).toBe("+2 Cartas");
   });
 
-  it("handles +1 Card(s) (catch-all lowercases Card first)", () => {
-    expect(translateCardText("+1 Card(s)")).toBe("+1 carta(s)");
+  it("handles +1 Card(s) to +1 Carta", () => {
+    expect(translateCardText("+1 Card(s)")).toBe("+1 Carta");
   });
 
   it("handles +N Action(s)", () => {
