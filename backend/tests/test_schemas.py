@@ -30,11 +30,12 @@ def test_list_cards_response_model(client):
 
 
 def test_random_response_model(client):
-    res = client.get("/api/cards/random", params={"expansions": "Dominion", "count": 10})
+    res = client.get("/api/cards/random", params={"expansions": "Dominion,Prosperity", "count": 10})
     data = res.json()
     assert isinstance(data["cards"], list)
     assert isinstance(data["active_expansions"], list)
     assert isinstance(data["special_rules"], list)
+    assert isinstance(data["extra_piles"], list)
     for item in data["active_expansions"]:
         assert isinstance(item, str)
     for item in data["special_rules"]:

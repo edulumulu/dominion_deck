@@ -304,7 +304,7 @@ function App() {
                       <h4 className="extra-pile-label">
                         {lang === "es" ? pile.pile_label_es : pile.pile_label}
                       </h4>
-                      <div className="card-grid extra-pile-cards">
+                      <div className={listView ? "extra-pile-cards card-list" : "extra-pile-cards card-grid"}>
                         {pile.cards.map((card: Card) => (
                           <div key={card.id} className="card-item">
                             <div className="card-img-wrap">

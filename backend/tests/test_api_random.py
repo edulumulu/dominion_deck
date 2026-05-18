@@ -114,3 +114,29 @@ def test_random_cards_landmarks_rule(client):
     data = res.json()
     rules = " ".join(data["special_rules"])
     assert "Landmarks" in rules
+
+
+def test_random_extra_piles_prosperity(client):
+    res = client.get("/api/cards/random", params={"expansions": "Prosperity", "count": 10})
+    data = res.json()
+    assert len(data["extra_piles"]) > 0
+    labels = [p["pile_label"] for p in data["extra_piles"]]
+    assert "Colony & Platinum" in labels
+    colony_plat = next(p for p in data["extra_piles"] if p["pile_label"] == "Colony & Platinum")
+    card_names = {c["card_name"] for c in colony_plat["cards"]}
+    assert "Colony" in card_names
+    assert "Platinum" in card_names
+
+
+def test_random_extra_piles_alchemy(client):
+    res = client.get("/api/cards/random", params={"expansions": "Alchemy", "count": 10})
+    data = res.json()
+    assert len(data["extra_piles"]) > 0
+    labels = [p["pile_label"] for p in data["extra_piles"]]
+    assert "Potion" in labels
+
+
+def test_random_extra_piles_no_extra_when_not_needed(client):
+    res = client.get("/api/cards/random", params={"expansions": "Dominion", "count": 10})
+    data = res.json()
+    assert data["extra_piles"] == []
