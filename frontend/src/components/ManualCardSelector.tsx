@@ -26,8 +26,7 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
       .then((all) => {
         const kingdom = all.filter((c) => c.is_kingdom_card);
         setCards(kingdom);
-        const names = [...new Set(kingdom.map((c) => c.set_name))];
-        setCheckedExps(new Set(names));
+        setCheckedExps(new Set(["Dominion"]));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
