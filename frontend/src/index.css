@@ -538,6 +538,17 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
+.empty-manual-hint {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--accent2);
+  font-weight: 500;
+}
+
+.btn-reset {
+  margin-left: auto;
+}
+
 @media (max-width: 640px) {
   .expansion-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -691,13 +702,39 @@ h1 {
   max-height: 50vh;
 }
 
-.manual-card-checkbox {
-  accent-color: var(--accent);
+.sidebar-card-item.selected {
+  background: var(--surface2);
+}
+
+.manual-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+.manual-selector-header:hover {
+  background: var(--surface2);
+}
+
+.manual-selector-header h3 {
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.manual-selector-arrow {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  transition: transform 0.15s;
   flex-shrink: 0;
 }
 
-.sidebar-card-item.selected {
-  background: var(--surface2);
+.manual-selector-arrow.open {
+  transform: rotate(90deg);
 }
 
 .manual-exp-filters {
@@ -705,6 +742,7 @@ h1 {
   flex-direction: column;
   gap: 0.15rem;
   padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   max-height: 140px;
   overflow-y: auto;
