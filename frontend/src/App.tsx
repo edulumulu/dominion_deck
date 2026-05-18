@@ -203,10 +203,10 @@ function App() {
         </div>
         <div className="header-toggles">
           <button
-            className={`icon-btn${result && !loading ? ` active` : ""}`}
+            className={`icon-btn${hasContent && !loading ? ` active` : ""}`}
             onClick={() => setListView((p) => !p)}
             title={listView ? t("grid_view") : t("list_view")}
-            disabled={!result || loading}
+            disabled={!hasContent || loading}
           >
             {listView ? "▦" : "☰"}
           </button>
