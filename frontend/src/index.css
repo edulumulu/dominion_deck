@@ -833,6 +833,10 @@ h1 {
   position: relative;
 }
 
+.card-list .manual-deck-card .card-body {
+  padding-right: 2.2rem;
+}
+
 .card-remove-btn {
   position: absolute;
   top: 4px;
