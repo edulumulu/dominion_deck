@@ -4,6 +4,7 @@ import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
 import { translateCardText } from "./translate-card-text";
 import CardSearchSidebar from "./components/CardSearchSidebar";
+import ManualCardSelector from "./components/ManualCardSelector";
 import CardDetailModal from "./components/CardDetailModal";
 import type { Expansion, Card, ExtraPile, RandomCardsResponse } from "./types";
 
@@ -33,6 +34,8 @@ const UI: Record<Lang, Record<string, string>> = {
     lang_es: "ES",
     potion_cost: "Requiere Poción",
     extra_piles_title: "Mazos extra",
+    manual_deck: "Mazo manual",
+    remove: "Eliminar",
   },
   en: {
     title: "Dominion Deck",
@@ -57,6 +60,8 @@ const UI: Record<Lang, Record<string, string>> = {
     lang_es: "ES",
     potion_cost: "Requires Potion",
     extra_piles_title: "Extra Supply Piles",
+    manual_deck: "Manual deck",
+    remove: "Remove",
   },
 };
 
@@ -71,8 +76,20 @@ function App() {
   const [listView, setListView] = useState(false);
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "es");
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [manualCards, setManualCards] = useState<Card[]>([]);
+  const manualCardIds = new Set(manualCards.map((c) => c.id));
 
   const t = (key: string) => UI[lang][key] ?? key;
+
+  const toggleManualCard = (card: Card) => {
+    setManualCards((prev) => {
+      if (prev.some((c) => c.id === card.id)) {
+        return prev.filter((c) => c.id !== card.id);
+      }
+      if (prev.length >= 10) return prev;
+      return [...prev, card];
+    });
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !dark);
@@ -232,6 +249,64 @@ function App() {
 
           {error && <div className="error">{error}</div>}
 
+          {manualCards.length > 0 && (
+            <div className="manual-deck">
+              <div className="manual-deck-header">
+                <h3>{t("manual_deck")} ({manualCards.length}/10)</h3>
+              </div>
+              <div className="card-grid">
+                {manualCards.map((card: Card) => (
+                  <div key={card.id} className="card-item manual-deck-card">
+                    <button
+                      className="card-remove-btn"
+                      onClick={() => toggleManualCard(card)}
+                      title={t("remove")}
+                    >
+                      ✕
+                    </button>
+                    <div className="card-img-wrap">
+                      <img
+                        className="card-img"
+                        src={getCardImageUrl(card.card_name)}
+                        alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="card-body">
+                      <div className="card-header">
+                        <span className="card-name">
+                          {lang === "es"
+                            ? (card.card_name_es || card.card_name)
+                            : card.card_name}
+                        </span>
+                        <span className="card-cost-wrap">
+                          <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
+                          {card.potion_cost && (
+                            <span className="potion-icon" title={t("potion_cost")}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M10 2v6l-4 6v2h12v-2l-4-6V2"/>
+                                <path d="M8 14c0 2 2 3 4 3s4-1 4-3"/>
+                                <path d="M8 2h8"/>
+                              </svg>
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="card-meta">
+                        <span className="badge badge-set">
+                          {lang === "es"
+                            ? (card.set_name_es || card.set_name)
+                            : card.set_name}
+                        </span>
+                        <span className="badge badge-type">{card.type}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {loading && <div className="loading">{t("loading")}</div>}
 
           {result && !loading && (
@@ -358,7 +433,14 @@ function App() {
           )}
         </div>
 
-        <CardSearchSidebar lang={lang} onSelectCard={setSelectedCard} />
+        <div className="sidebar-col">
+          <CardSearchSidebar lang={lang} onSelectCard={setSelectedCard} />
+          <ManualCardSelector
+            lang={lang}
+            selectedCardIds={manualCardIds}
+            onToggleCard={toggleManualCard}
+          />
+        </div>
       </div>
 
       {selectedCard && (
