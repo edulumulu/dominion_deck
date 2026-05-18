@@ -482,22 +482,24 @@ h1 {
   border-radius: 12px;
   padding: 1.25rem;
   background: color-mix(in srgb, var(--accent2) 8%, var(--surface));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .extra-piles-title {
+  width: 100%;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--accent2);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   letter-spacing: 0.01em;
+  flex: 0 0 100%;
 }
 
 .extra-pile-group {
-  margin-bottom: 1.25rem;
-}
-
-.extra-pile-group:last-child {
-  margin-bottom: 0;
+  flex: 1;
+  min-width: 160px;
 }
 
 .extra-pile-label {
