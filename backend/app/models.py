@@ -28,4 +28,5 @@ class Card(Base):
     type = Column(String, nullable=False)
     is_kingdom_card = Column(Boolean, default=True)
     cost = Column(String, nullable=False)
+    potion_cost = Column(Boolean, default=False)
     card_text = Column(Text, default="")

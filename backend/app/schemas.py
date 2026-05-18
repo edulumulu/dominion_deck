@@ -25,6 +25,7 @@ class CardOut(BaseModel):
     type: str
     is_kingdom_card: bool
     cost: str
+    potion_cost: bool = False
     card_text: str
 
     model_config = {"from_attributes": True}

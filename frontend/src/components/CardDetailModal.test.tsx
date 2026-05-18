@@ -11,6 +11,7 @@ const mockCard = {
   type: "Action-Attack",
   is_kingdom_card: true,
   cost: "5",
+  potion_cost: false,
   card_text: "+2 Cards\n+1 Action",
 };
 
@@ -48,6 +49,6 @@ describe("CardDetailModal", () => {
 
   it("shows translated card text in ES", () => {
     render(<CardDetailModal card={mockCard} lang="es" onClose={onClose} />);
-    expect(screen.getByText(/\+2 cartas/)).toBeInTheDocument();
+    expect(screen.getByText(/\+2 Cartas/)).toBeInTheDocument();
   });
 });
