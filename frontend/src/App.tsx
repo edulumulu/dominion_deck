@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchExpansions, fetchRandomCards, fetchAllCards } from "./api";
 import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
@@ -86,6 +86,7 @@ function App() {
   const hasManualDeck = manualCards.length > 0;
   const hasAutoDeck = result !== null && !loading;
   const hasContent = hasManualDeck || hasAutoDeck;
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const t = (key: string) => UI[lang][key] ?? key;
 
@@ -96,6 +97,7 @@ function App() {
   };
 
   const toggleManualCard = (card: Card) => {
+    const willAdd = !manualCardIds.has(card.id);
     setManualCards((prev) => {
       if (prev.some((c) => c.id === card.id)) {
         return prev.filter((c) => c.id !== card.id);
@@ -103,6 +105,12 @@ function App() {
       if (prev.length >= 10) return prev;
       return [...prev, card];
     });
+    if (willAdd && sidebarRef.current) {
+      const header = sidebarRef.current.querySelector(".manual-selector-header");
+      if (header) {
+        header.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   };
 
   useEffect(() => {
@@ -535,7 +543,7 @@ function App() {
           )}
         </div>
 
-        <div className="sidebar-col">
+        <div className="sidebar-col" ref={sidebarRef}>
           <CardSearchSidebar lang={lang} onSelectCard={setSelectedCard} />
           <ManualCardSelector
             lang={lang}

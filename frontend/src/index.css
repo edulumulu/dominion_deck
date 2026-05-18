@@ -581,6 +581,11 @@ h1 {
   gap: 1rem;
   width: 260px;
   flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
 }
 
 .sidebar-col .sidebar-right {
@@ -597,9 +602,6 @@ h1 {
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 2rem);
-  position: sticky;
-  top: 1rem;
 }
 
 .sidebar-header {
