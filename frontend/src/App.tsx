@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { fetchExpansions, fetchRandomCards } from "./api";
+import { useState, useEffect, useMemo } from "react";
+import { fetchExpansions, fetchRandomCards, fetchAllCards } from "./api";
 import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
 import { translateCardText } from "./translate-card-text";
@@ -36,6 +36,8 @@ const UI: Record<Lang, Record<string, string>> = {
     extra_piles_title: "Mazos extra",
     manual_deck: "Mazo manual",
     remove: "Eliminar",
+    reset: "Reiniciar",
+    empty_manual: "Selecciona las cartas de tu mazo manualmente con Selección manual",
   },
   en: {
     title: "Dominion Deck",
@@ -62,6 +64,8 @@ const UI: Record<Lang, Record<string, string>> = {
     extra_piles_title: "Extra Supply Piles",
     manual_deck: "Manual deck",
     remove: "Remove",
+    reset: "Reset",
+    empty_manual: "Or pick your cards manually with Manual pick",
   },
 };
 
@@ -77,9 +81,19 @@ function App() {
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "es");
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [manualCards, setManualCards] = useState<Card[]>([]);
+  const [allCards, setAllCards] = useState<Card[]>([]);
   const manualCardIds = new Set(manualCards.map((c) => c.id));
+  const hasManualDeck = manualCards.length > 0;
+  const hasAutoDeck = result !== null && !loading;
+  const hasContent = hasManualDeck || hasAutoDeck;
 
   const t = (key: string) => UI[lang][key] ?? key;
+
+  const resetAll = () => {
+    setManualCards([]);
+    setResult(null);
+    setError("");
+  };
 
   const toggleManualCard = (card: Card) => {
     setManualCards((prev) => {
@@ -104,7 +118,37 @@ function App() {
         setExpansions(exps);
       })
       .catch(() => setError("No se pudo conectar con el servidor"));
+    fetchAllCards().then(setAllCards).catch(() => {});
   }, []);
+
+  const manualExtraPiles = useMemo(() => {
+    if (manualCards.length === 0) return [];
+    const selectedNames = new Set(manualCards.map((c) => c.card_name));
+    const expNames = [...new Set(manualCards.map((c) => c.set_name))];
+    const allCardsMap = new Map(allCards.map((c) => [c.card_name, c]));
+
+    const EXTRA_PILES_CONFIG = [
+      { pile_label: "Colony & Platinum", pile_label_es: "Colonia y Platino", condition: expNames.includes("Prosperity"), card_names: ["Colony", "Platinum"] },
+      { pile_label: "Potion", pile_label_es: "Poción", condition: expNames.includes("Alchemy"), card_names: ["Potion"] },
+      { pile_label: "Ruins", pile_label_es: "Ruinas", condition: ["Cultist", "Marauder", "Death Cart"].some((n) => selectedNames.has(n)), card_names: ["Abandoned Mine", "Ruined Library", "Ruined Market", "Ruined Village", "Survivors"] },
+      { pile_label: "Spoils", pile_label_es: "Botín", condition: ["Marauder", "Bandit Camp", "Pillage"].some((n) => selectedNames.has(n)), card_names: ["Spoils"] },
+      { pile_label: "Madman", pile_label_es: "Loco", condition: selectedNames.has("Hermit"), card_names: ["Madman"] },
+      { pile_label: "Mercenary", pile_label_es: "Mercenario", condition: selectedNames.has("Urchin"), card_names: ["Mercenary"] },
+      { pile_label: "Prizes", pile_label_es: "Premios", condition: selectedNames.has("Tournament"), card_names: ["Bag of Gold", "Diadem", "Followers", "Princess", "Trusty Steed"] },
+      { pile_label: "Wish", pile_label_es: "Deseo", condition: ["Leprechaun", "Magic Lamp"].some((n) => selectedNames.has(n)), card_names: ["Wish"] },
+      { pile_label: "Imp", pile_label_es: "Diablillo", condition: ["Devil's Workshop", "Tormentor"].some((n) => selectedNames.has(n)), card_names: ["Imp"] },
+      { pile_label: "Ghost", pile_label_es: "Fantasma", condition: ["Exorcist", "Haunted Mirror"].some((n) => selectedNames.has(n)), card_names: ["Ghost"] },
+      { pile_label: "Bat", pile_label_es: "Murciélago", condition: selectedNames.has("Vampire"), card_names: ["Bat"] },
+    ];
+
+    return EXTRA_PILES_CONFIG
+      .filter((cfg) => cfg.condition)
+      .map((cfg) => ({
+        pile_label: cfg.pile_label,
+        pile_label_es: cfg.pile_label_es,
+        cards: cfg.card_names.map((name) => allCardsMap.get(name)).filter(Boolean) as Card[],
+      }));
+  }, [manualCards, allCards]);
 
   const toggle = (name: string) => {
     setSelected((prev) => {
@@ -200,10 +244,15 @@ function App() {
             <button
               className="btn btn-primary"
               onClick={generate}
-              disabled={loading || selected.size === 0}
+              disabled={loading || selected.size === 0 || hasManualDeck}
             >
               {loading ? t("generating") : t("generate")}
             </button>
+            {hasContent && (
+              <button className="btn btn-secondary btn-reset" onClick={resetAll}>
+                {t("reset")}
+              </button>
+            )}
           </div>
 
           <div className="expansion-grid">
@@ -304,6 +353,58 @@ function App() {
                   </div>
                 ))}
               </div>
+
+              {manualExtraPiles.length > 0 && (
+                <div className="extra-piles" style={{ marginTop: "1.25rem" }}>
+                  <h3 className="extra-piles-title">{t("extra_piles_title")}</h3>
+                  {manualExtraPiles.map((pile: ExtraPile) => (
+                    <div key={pile.pile_label} className="extra-pile-group">
+                      <h4 className="extra-pile-label">
+                        {lang === "es" ? pile.pile_label_es : pile.pile_label}
+                      </h4>
+                      <div className="card-grid extra-pile-cards">
+                        {pile.cards.map((card: Card) => (
+                          <div key={card.card_name} className="card-item">
+                            <div className="card-img-wrap">
+                              <img
+                                className="card-img"
+                                src={getCardImageUrl(card.card_name)}
+                                alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="card-body">
+                              <div className="card-header">
+                                <span className="card-name">
+                                  {lang === "es"
+                                    ? (card.card_name_es || card.card_name)
+                                    : card.card_name}
+                                </span>
+                                <span className="card-cost-wrap">
+                                  <span className="card-cost" title={card.cost}>{card.cost.replace(/[^0-9]/g, "")}</span>
+                                </span>
+                              </div>
+                              <div className="card-meta">
+                                <span className="badge badge-set">
+                                  {lang === "es"
+                                    ? (card.set_name_es || card.set_name)
+                                    : card.set_name}
+                                </span>
+                                <span className="badge badge-type">{card.type}</span>
+                              </div>
+                              <div className="card-text">
+                                {lang === "es"
+                                  ? translateCardText(card.card_text)
+                                  : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -425,10 +526,11 @@ function App() {
             </>
           )}
 
-          {!result && !loading && !error && (
+          {!hasContent && !loading && !error && (
             <div className="empty-state">
               <h3>{t("empty_title")}</h3>
               <p>{t("empty_desc")}</p>
+              <p className="empty-manual-hint">{t("empty_manual")}</p>
             </div>
           )}
         </div>

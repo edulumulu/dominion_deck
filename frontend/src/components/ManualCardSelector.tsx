@@ -19,6 +19,7 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkedExps, setCheckedExps] = useState<Set<string>>(new Set());
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     fetchAllCards()
@@ -69,61 +70,60 @@ export default function ManualCardSelector({ lang, selectedCardIds, onToggleCard
 
   return (
     <div className="sidebar-right manual-selector">
-      <div className="sidebar-header">
+      <div className="manual-selector-header" onClick={() => setOpen((p) => !p)}>
+        <span className={`manual-selector-arrow${open ? " open" : ""}`}>▶</span>
         <h3>{lang === "es" ? "Selección manual" : "Manual pick"}</h3>
       </div>
 
-      <div className="manual-exp-filters">
-        {loading && <div className="sidebar-status">
-          {lang === "es" ? "Cargando..." : "Loading..."}
-        </div>}
-        {!loading && expNames.map((e) => (
-          <label key={e.name} className="manual-exp-filter">
-            <input
-              type="checkbox"
-              checked={checkedExps.has(e.name)}
-              onChange={() => toggleExp(e.name)}
-            />
-            <span>{lang === "es" ? (e.name_es || e.name) : e.name}</span>
-          </label>
-        ))}
-      </div>
-
-      <div className="sidebar-results">
-        {groups.map((g) => (
-          <div key={g.name} className="manual-exp-section">
-            <div className="manual-exp-title">
-              {lang === "es" ? g.name_es : g.name}
-            </div>
-            {g.cards.map((card) => (
-              <div
-                key={card.id}
-                className={`sidebar-card-item${selectedCardIds.has(card.id) ? " selected" : ""}`}
-                onClick={() => onToggleCard(card)}
-              >
+      {open && (
+        <>
+          <div className="manual-exp-filters">
+            {loading && <div className="sidebar-status">
+              {lang === "es" ? "Cargando..." : "Loading..."}
+            </div>}
+            {!loading && expNames.map((e) => (
+              <label key={e.name} className="manual-exp-filter">
                 <input
                   type="checkbox"
-                  className="manual-card-checkbox"
-                  checked={selectedCardIds.has(card.id)}
-                  onChange={() => {}}
+                  checked={checkedExps.has(e.name)}
+                  onChange={() => toggleExp(e.name)}
                 />
-                <img
-                  className="sidebar-card-img"
-                  src={getCardImageUrl(card.card_name)}
-                  alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
-                  loading="lazy"
-                />
-                <div className="sidebar-card-info">
-                  <span className="sidebar-card-name">
-                    {lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
-                  </span>
-                  <span className="sidebar-card-type">{card.type}</span>
+                <span>{lang === "es" ? (e.name_es || e.name) : e.name}</span>
+              </label>
+            ))}
+          </div>
+
+          <div className="sidebar-results">
+            {groups.map((g) => (
+              <div key={g.name} className="manual-exp-section">
+                <div className="manual-exp-title">
+                  {lang === "es" ? g.name_es : g.name}
                 </div>
+                {g.cards.map((card) => (
+                  <div
+                    key={card.id}
+                    className={`sidebar-card-item${selectedCardIds.has(card.id) ? " selected" : ""}`}
+                    onClick={() => onToggleCard(card)}
+                  >
+                    <img
+                      className="sidebar-card-img"
+                      src={getCardImageUrl(card.card_name)}
+                      alt={lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                      loading="lazy"
+                    />
+                    <div className="sidebar-card-info">
+                      <span className="sidebar-card-name">
+                        {lang === "es" ? (card.card_name_es || card.card_name) : card.card_name}
+                      </span>
+                      <span className="sidebar-card-type">{card.type}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }
