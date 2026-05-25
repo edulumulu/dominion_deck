@@ -11,9 +11,9 @@ test.describe("Dominion Deck E2E", () => {
   test("selects expansions and generates a full deck of 10 cards", async ({ page }) => {
     await page.goto("/");
 
-    await page.getByText("Dominion").click();
-    await page.getByText("Intriga").click();
-    await page.getByText("Terramar").click();
+    await page.locator(".expansion-card").filter({ hasText: "Dominion" }).click();
+    await page.locator(".expansion-card").filter({ hasText: "Intriga" }).click();
+    await page.locator(".expansion-card").filter({ hasText: "Terramar" }).click();
 
     await page.getByRole("button", { name: "Generar Mazo" }).click();
 
