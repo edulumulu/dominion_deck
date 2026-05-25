@@ -1,3 +1,4 @@
+import os
 import random
 
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -10,11 +11,17 @@ from app.models import Card, Expansion
 from app.schemas import CardOut, ExpansionOut, ExtraPileOut, RandomCardsResponse
 from app.seed import seed_database
 
+origins = os.getenv("CORS_ORIGINS", "*")
+if origins == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [o.strip() for o in origins.split(",")]
+
 app = FastAPI(title="Dominion Deck API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
