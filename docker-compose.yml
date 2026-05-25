@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: dominion
-      POSTGRES_DB: dominion
-      POSTGRES_PASSWORD: dominion
+      POSTGRES_USER: ${DB_USER:-dominion}
+      POSTGRES_DB: ${DB_NAME:-dominion}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dominion -d dominion"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dominion} -d ${DB_NAME:-dominion}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,8 +24,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://dominion:dominion@db:5432/dominion
-      CORS_ORIGINS: "*"
+      DATABASE_URL: postgresql://${DB_USER:-dominion}:${DB_PASSWORD:?DB_PASSWORD is required}@db:5432/${DB_NAME:-dominion}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/api/expansions || exit 1"]
       interval: 10s

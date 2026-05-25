@@ -4,7 +4,10 @@ venv/
 *.db
 node_modules/
 dist/
+.env
 .env.local
 .env.*.local
+backend/.env
+frontend/.env
 .claude/
 .idea/
