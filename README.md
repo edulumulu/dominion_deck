@@ -24,14 +24,14 @@ docker compose build --no-cache && docker compose up -d
 cd backend
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8000
 ```
 
-**Frontend**:
+**Frontend** (proxies `/api` to `localhost:8000`):
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev   # → http://localhost:5173
 ```
 
 ## Running Tests
@@ -67,10 +67,10 @@ See [tests.md](tests.md) for the complete test plan with all phases and test cas
 | Phase | Status | Description |
 |---|---|---|
 | Phase 1 | Done | Backend API tests (pytest) — 36 tests |
-| Phase 2 | Pending | Frontend pure function tests (vitest) |
-| Phase 3 | Pending | Frontend component tests (vitest + RTL) |
-| Phase 4 | Pending | E2E tests (Playwright) |
-| Phase 5 | Pending | Docker health checks |
+| Phase 2 | Done | Frontend pure function tests (vitest) — card-images, translate-card-text, expansion-symbols |
+| Phase 3 | Done | Frontend component tests (vitest + RTL) — App, CardSearchSidebar, CardDetailModal, ManualCardSelector |
+| Phase 4 | Done | E2E tests (Playwright) — 6 tests |
+| Phase 5 | Done | Docker health checks |
 
 ## Project Structure
 
@@ -96,10 +96,18 @@ dominion_deck/
 │   │   ├── card-images.ts   # Card image URLs
 │   │   ├── expansion-symbols.ts  # SVG expansion symbols
 │   │   ├── translate-card-text.ts # EN→ES text translation
+│   │   ├── test-setup.ts    # Vitest setup (jest-dom matchers, mocks)
 │   │   ├── components/      # React components
+│   │   │   ├── CardSearchSidebar.tsx
+│   │   │   ├── CardDetailModal.tsx
+│   │   │   └── ManualCardSelector.tsx
 │   │   └── index.css        # All styles
+│   ├── e2e/                 # Playwright E2E tests
 │   ├── Dockerfile
 │   └── nginx.conf
+├── .husky/
+│   ├── pre-commit           # lint + test + build
+│   └── pre-push             # test:e2e
 ├── docker-compose.yml
 ├── tests.md                 # Test plan
 └── README.md
@@ -112,3 +120,44 @@ dominion_deck/
 | GET | `/api/expansions` | List all expansions |
 | GET | `/api/cards?expansion=...&kingdom_only=true` | List cards |
 | GET | `/api/cards/random?expansions=...&count=10` | Generate random deck |
+
+## Commands Reference
+
+### Frontend (`cd frontend/`)
+| Command | What it does |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server on :5173 (proxies `/api` → `:8000`) |
+| `npm run build` | `tsc -b && vite build` — typecheck + production bundle |
+| `npm run lint` | ESLint — check code style |
+| `npm test` | Vitest — run unit + component tests (54 tests) |
+| `npm run test:e2e` | Playwright E2E tests (requires Docker on :80) |
+| `npx playwright test --ui` | Playwright UI mode (interactive debug) |
+
+### Backend (`cd backend/`)
+| Command | What it does |
+|---------|-------------|
+| `source venv/bin/activate` | Activate Python virtualenv |
+| `uvicorn app.main:app --reload --port 8000` | Start dev server with hot reload |
+| `python -m pytest tests/ -v` | Run all backend tests |
+| `python -m pytest tests/ -v -k "test_name"` | Run specific test |
+
+### Docker (project root `./`)
+| Command | What it does |
+|---------|-------------|
+| `docker compose up -d` | Start containers (frontend on :80, backend on :8000) |
+| `docker compose down` | Stop and remove containers |
+| `docker compose down --rmi all --volumes` | Stop, remove containers, images, and volumes |
+| `docker compose build --no-cache && docker compose up -d` | Full rebuild from scratch (re-seeds DB) |
+| `docker compose restart` | Restart containers without rebuild |
+| `docker compose logs -f` | Tail logs from all services |
+| `docker compose logs -f backend` | Tail logs from backend only |
+| `docker compose ps` | List running containers and their status |
+| `docker compose exec backend curl http://localhost:8000/api/expansions` | Health check from inside the container |
+| `docker image prune -f` | Remove dangling images |
+
+### Git Hooks (automatic, via husky)
+| Trigger | What runs |
+|---------|-----------|
+| `git commit` | `npm run lint && npm test && npm run build` (from `frontend/`) |
+| `git push` | `npm run test:e2e` (requires Docker on :80) |
+| `git push --no-verify` | Skip hooks (bypass e2e if Docker is down) |
