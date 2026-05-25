@@ -27,6 +27,7 @@ class CardOut(BaseModel):
     cost: str
     potion_cost: bool = False
     card_text: str
+    card_text_es: str = ""
 
     model_config = {"from_attributes": True}
 

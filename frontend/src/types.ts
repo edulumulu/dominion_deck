@@ -22,6 +22,7 @@ export interface Card {
   cost: string;
   potion_cost: boolean;
   card_text: string;
+  card_text_es: string;
 }
 
 export interface ExtraPile {

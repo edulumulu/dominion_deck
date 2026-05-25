@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getCardImageUrl } from "../card-images";
-import { translateCardText } from "../translate-card-text";
+
 import { getExpansionSymbol } from "../expansion-symbols";
 import type { Card } from "../types";
 
@@ -73,7 +73,9 @@ export default function CardDetailModal({ card, lang, onClose }: Props) {
             </div>
             <div className="modal-text">
               {lang === "es"
-                ? translateCardText(card.card_text)
+                ? (card.card_text_es || card.card_text)
+                    .replace(/\\n/g, "\n")
+                    .replace(/\\d/g, "\n—\n")
                 : card.card_text
                     .replace(/\\n/g, "\n")
                     .replace(/\\d/g, "\n—\n")}
