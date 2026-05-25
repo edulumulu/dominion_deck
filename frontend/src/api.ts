@@ -1,6 +1,6 @@
 import type { Card } from "./types";
 
-const API_BASE = "";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 export async function fetchExpansions() {
   const res = await fetch(`${API_BASE}/api/expansions`);
