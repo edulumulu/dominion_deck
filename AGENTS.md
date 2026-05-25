@@ -9,12 +9,16 @@ Web app that generates random Dominion Kingdom card decks.
 ## Commands (run from `frontend/`)
 | Command | What it does |
 |---------|-------------|
-| `npm run dev` | Vite HMR dev server on :5173 |
+| `npm run dev` | Vite HMR dev server on :5173 (proxies `/api` → `localhost:8000`) |
 | `npm run build` | `tsc -b && vite build` (typecheck + production bundle) |
 | `npm run lint` | ESLint |
 | `npm test` | vitest (unit + component tests) |
 | `npm run test:e2e` | Playwright E2E tests (Docker must be running on :80) |
 | `docker compose build --no-cache && docker compose up -d` | Full rebuild & restart |
+
+## Git hooks (husky)
+- **pre-commit**: runs `frontend/`: lint → test → build. Fails the commit if any step fails.
+- **pre-push**: runs `frontend/`: test:e2e. Requires Docker on :80. Use `git push --no-verify` to skip.
 
 ## Architecture facts an agent will miss
 
@@ -26,7 +30,7 @@ Web app that generates random Dominion Kingdom card decks.
 - **28 non-supply cards** (Ruins, Shelters, Prizes, Traveller upgrades, Spirits, Spoils, Madman, Mercenary) are forced `is_kingdom_card=0` by both the CSV data and a safety filter in `seed.py`.
 - **Unit/component tests**: vitest in `frontend/src/*.test.ts(x)`. Component tests use jsdom + RTL.
 - **E2E tests**: Playwright in `frontend/e2e/`. Requires Docker running on :80.
-- **API proxy**: nginx forwards `/api/` to `backend:8000`. In dev mode the Vite server does not proxy — you must call the backend directly.
+- **API proxy**: nginx forwards `/api/` to `backend:8000` in production. In dev mode the Vite server proxies `/api` → `localhost:8000`.
 
 ## Git conventions
 - Feature branches: `feature/SN-XXXX`
