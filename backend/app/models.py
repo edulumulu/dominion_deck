@@ -30,3 +30,4 @@ class Card(Base):
     cost = Column(String, nullable=False)
     potion_cost = Column(Boolean, default=False)
     card_text = Column(Text, default="")
+    card_text_es = Column(Text, default="")

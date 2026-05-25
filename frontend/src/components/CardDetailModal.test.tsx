@@ -13,6 +13,7 @@ const mockCard = {
   cost: "5",
   potion_cost: false,
   card_text: "+2 Cards\n+1 Action",
+  card_text_es: "+2 Cartas\n+1 Acción",
 };
 
 const onClose = vi.fn();

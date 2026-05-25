@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchExpansions, fetchRandomCards, fetchAllCards } from "./api";
 import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
-import { translateCardText } from "./translate-card-text";
+
 import CardSearchSidebar from "./components/CardSearchSidebar";
 import ManualCardSelector from "./components/ManualCardSelector";
 import CardDetailModal from "./components/CardDetailModal";
@@ -402,7 +402,7 @@ function App() {
                               </div>
                               <div className="card-text">
                                 {lang === "es"
-                                  ? translateCardText(card.card_text)
+                                  ? (card.card_text_es || card.card_text).replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")
                                   : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
                               </div>
                             </div>
@@ -472,7 +472,7 @@ function App() {
                       </div>
                       <div className="card-text">
                         {lang === "es"
-                          ? translateCardText(card.card_text)
+                          ? (card.card_text_es || card.card_text).replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")
                           : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
                       </div>
                     </div>
@@ -520,7 +520,7 @@ function App() {
                               </div>
                               <div className="card-text">
                                 {lang === "es"
-                                  ? translateCardText(card.card_text)
+                                  ? (card.card_text_es || card.card_text).replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")
                                   : card.card_text.replace(/\\n/g, "\n").replace(/\\d/g, "\n—\n")}
                               </div>
                             </div>

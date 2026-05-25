@@ -66,7 +66,7 @@ See [tests.md](tests.md) for the complete test plan with all phases and test cas
 | Phase | Status | Description |
 |---|---|---|
 | Phase 1 | Done | Backend API tests (pytest) — 36 tests |
-| Phase 2 | Done | Frontend pure function tests (vitest) — card-images, translate-card-text, expansion-symbols |
+| Phase 2 | Done | Frontend pure function tests (vitest) — card-images, expansion-symbols |
 | Phase 3 | Done | Frontend component tests (vitest + RTL) — App, CardSearchSidebar, CardDetailModal, ManualCardSelector |
 | Phase 4 | Done | E2E tests (Playwright) — 6 tests |
 | Phase 5 | Done | Docker health checks |
@@ -94,7 +94,7 @@ dominion_deck/
 │   │   ├── types.ts         # TypeScript types
 │   │   ├── card-images.ts   # Card image URLs
 │   │   ├── expansion-symbols.ts  # SVG expansion symbols
-│   │   ├── translate-card-text.ts # EN→ES text translation
+│   │   ├── translate-card-text.ts # EN→ES text translation (REMOVED — now served from DB)
 │   │   ├── test-setup.ts    # Vitest setup (jest-dom matchers, mocks)
 │   │   ├── components/      # React components
 │   │   │   ├── CardSearchSidebar.tsx
