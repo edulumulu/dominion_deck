@@ -19,10 +19,10 @@ docker compose build --no-cache && docker compose up -d
 
 ### Development (without Docker)
 
-**Backend**:
+**Backend** (usa `python3` en macOS si `python` no está disponible):
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
@@ -41,8 +41,7 @@ npm run dev   # → http://localhost:5173
 ```bash
 cd backend
 source venv/bin/activate
-pip install -r requirements.txt
-python -m pytest tests/ -v
+python3 -m pytest tests/ -v
 ```
 
 ### Frontend (vitest)
@@ -138,8 +137,8 @@ dominion_deck/
 |---------|-------------|
 | `source venv/bin/activate` | Activate Python virtualenv |
 | `uvicorn app.main:app --reload --port 8000` | Start dev server with hot reload |
-| `python -m pytest tests/ -v` | Run all backend tests |
-| `python -m pytest tests/ -v -k "test_name"` | Run specific test |
+| `python3 -m pytest tests/ -v` | Run all backend tests |
+| `python3 -m pytest tests/ -v -k "test_name"` | Run specific test |
 
 ### Docker (project root `./`)
 | Command | What it does |
