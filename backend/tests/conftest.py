@@ -23,6 +23,7 @@ def _seed(session):
             raw_is_kingdom = row["is_kingdom_card"].strip() == "1"
             card_type = row["type"]
             card_text = row["card_text"]
+            card_text_es = row.get("card_text_es", "").strip()
             is_kingdom = (
                 raw_is_kingdom
                 and "This is not in the Supply." not in card_text
@@ -37,6 +38,7 @@ def _seed(session):
                 is_kingdom_card=is_kingdom,
                 cost=row["cost"],
                 card_text=card_text,
+                card_text_es=card_text_es,
             ))
 
     expansion_meta = {

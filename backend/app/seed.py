@@ -163,6 +163,7 @@ def seed_database():
                 raw_is_kingdom = row["is_kingdom_card"].strip() == "1"
                 card_type = row["type"]
                 card_text = row["card_text"]
+                card_text_es = row.get("card_text_es", "").strip()
                 is_kingdom = (
                     raw_is_kingdom
                     and "This is not in the Supply." not in card_text
@@ -179,6 +180,7 @@ def seed_database():
                     cost=row["cost"],
                     potion_cost=row.get("potion", "0").strip() == "1",
                     card_text=card_text,
+                    card_text_es=card_text_es,
                 )
                 db.add(card)
 

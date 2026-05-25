@@ -48,14 +48,7 @@
 | `getCardImageUrl` strips apostrophes and normalizes | `card-images.ts` | URL-safe slug |
 | `getExpansionSymbol("Dominion")` | `expansion-symbols.ts` | Returns valid SVG string |
 | `getExpansionSymbol("Unknown")` | `expansion-symbols.ts` | Falls back to Dominion SVG |
-| `translateCardText` translates phrases | `translate-card-text.ts` | "Draw a card" → "Roba una carta" |
-| `translateCardText` handles +N Card(s) | `translate-card-text.ts` | `+2 Card(s)` → `+2 Cartas` |
-| `translateCardText` handles +N Action(s) | `translate-card-text.ts` | `+1 Action` → `+1 Acción` |
-| `translateCardText` handles +N Buy(s) | `translate-card-text.ts` | `+1 Buy` → `+1 Compra` |
-| `translateCardText` handles +N VP | `translate-card-text.ts` | `+2VP` → `+2 PV` |
-| `translateCardText` preserves English if no match | `translate-card-text.ts` | Unknown text stays unchanged |
-| `translateCardText` handles escaped newlines | `translate-card-text.ts` | `\\n` → newline, `\\d` → `—` |
-| `translateCardText` translates card types | `translate-card-text.ts` | "Action-Attack" → "Acción-Ataque" |
+| card_text_es served from DB | `App.tsx` / `CardDetailModal.tsx` | `card.card_text_es` shown when `lang="es"` |
 
 ---
 

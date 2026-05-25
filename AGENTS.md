@@ -23,7 +23,7 @@ Web app that generates random Dominion Kingdom card decks.
 ## Architecture facts an agent will miss
 
 - **All CSS is in one file**: `frontend/src/index.css` — no CSS modules or style libs.
-- **UI strings are bilingual** via a `UI` map in `App.tsx` (`App.tsx:8-53`). EN/ES toggle stored in localStorage key `"lang"`. Card text is translated client-side by `translate-card-text.ts` (regex). Do NOT look for locale files or i18n libs.
+- **UI strings are bilingual** via a `UI` map in `App.tsx` (`App.tsx:8-53`). EN/ES toggle stored in localStorage key `"lang"`. Card text is stored in the DB column `card_text_es` (populated from the official Spanish PDF for sets up to Dark Ages, auto-translated for newer sets). The old client-side translator (`translate-card-text.ts`) has been removed.
 - **Dark mode** is a `.light` class on `.app` div. Toggle stored in localStorage key `"theme"`.
 - **Card images** come from `connorburt/dominion-cards` GitHub repo at 1260×2016 (5:8 ratio). URL built in `card-images.ts`. The CSS uses `object-fit: contain` and `aspect-ratio: 5 / 8`.
 - **DB is SQLite** inside the container at `/app/dominion.db`. No volume is mounted — it is destroyed on container recreate. Data auto-seeds from `backend/dominion_cards.csv` on first startup. To re-seed: rebuild the backend container.
