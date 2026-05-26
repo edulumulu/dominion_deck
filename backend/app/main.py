@@ -1,7 +1,7 @@
 import os
 import random
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -24,6 +24,23 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' https://raw.githubusercontent.com data:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'"
+    )
+    return response
+
+
 @app.on_event("startup")
 def on_startup():
     seed_database()
@@ -37,12 +54,15 @@ def list_expansions(db: Session = Depends(get_db)):
 
 @app.get("/api/cards", response_model=list[CardOut])
 def list_cards(
-    expansion: str | None = Query(None),
+    expansion: str | None = Query(None, max_length=100),
     kingdom_only: bool = Query(True),
     db: Session = Depends(get_db),
 ):
     q = db.query(Card)
     if expansion:
+        valid_names = {row[0] for row in db.query(Expansion.name).all()}
+        if expansion not in valid_names:
+            raise HTTPException(status_code=400, detail="Invalid expansion")
         q = q.filter(Card.set_name == expansion)
     if kingdom_only:
         q = q.filter(Card.is_kingdom_card == True)
@@ -51,11 +71,15 @@ def list_cards(
 
 @app.get("/api/cards/random", response_model=RandomCardsResponse)
 def random_cards(
-    expansions: str = Query(..., description="Comma-separated expansion names"),
+    expansions: str = Query(..., max_length=500, description="Comma-separated expansion names"),
     count: int = Query(10, ge=1, le=20),
     db: Session = Depends(get_db),
 ):
-    exp_names = [e.strip() for e in expansions.split(",") if e.strip()]
+    raw_names = [e.strip() for e in expansions.split(",") if e.strip()]
+    valid_names = {row[0] for row in db.query(Expansion.name).all()}
+    exp_names = [e for e in raw_names if e in valid_names]
+    if not exp_names:
+        raise HTTPException(status_code=400, detail="No valid expansions provided")
 
     q = db.query(Card).filter(
         Card.is_kingdom_card == True,

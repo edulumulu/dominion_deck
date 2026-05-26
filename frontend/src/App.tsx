@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchExpansions, fetchRandomCards, fetchAllCards } from "./api";
-import { getExpansionSymbol } from "./expansion-symbols";
 import { getCardImageUrl } from "./card-images";
+import { ExpansionSymbol } from "./components/ExpansionSymbol";
 
 import CardSearchSidebar from "./components/CardSearchSidebar";
 import ManualCardSelector from "./components/ManualCardSelector";
@@ -275,12 +275,7 @@ function App() {
                   checked={selected.has(exp.name)}
                   onChange={() => {}}
                 />
-                <span
-                  className="expansion-symbol"
-                  dangerouslySetInnerHTML={{
-                    __html: getExpansionSymbol(exp.name),
-                  }}
-                />
+                <ExpansionSymbol name={exp.name} />
                 <div>
                   <div className="exp-name">
                     {lang === "es" ? exp.name_es : exp.name}

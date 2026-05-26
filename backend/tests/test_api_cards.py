@@ -45,8 +45,7 @@ def test_list_cards_by_expansion(client):
 
 def test_list_cards_by_expansion_nonexistent(client):
     res = client.get("/api/cards?expansion=NonExistent")
-    data = res.json()
-    assert len(data) == 0
+    assert res.status_code == 400
 
 
 def test_card_fields(client):
