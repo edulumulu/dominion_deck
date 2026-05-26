@@ -3,6 +3,9 @@ import random
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -13,7 +16,11 @@ from app.seed import seed_database
 
 cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost").split(",")]
 
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="Dominion Deck API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,13 +54,16 @@ def on_startup():
 
 
 @app.get("/api/expansions", response_model=list[ExpansionOut])
-def list_expansions(db: Session = Depends(get_db)):
+@limiter.limit("60/minute")
+def list_expansions(request: Request, db: Session = Depends(get_db)):
     expansions = db.query(Expansion).all()
     return expansions
 
 
 @app.get("/api/cards", response_model=list[CardOut])
+@limiter.limit("60/minute")
 def list_cards(
+    request: Request,
     expansion: str | None = Query(None, max_length=100),
     kingdom_only: bool = Query(True),
     db: Session = Depends(get_db),
@@ -70,7 +80,9 @@ def list_cards(
 
 
 @app.get("/api/cards/random", response_model=RandomCardsResponse)
+@limiter.limit("20/minute")
 def random_cards(
+    request: Request,
     expansions: str = Query(..., max_length=500, description="Comma-separated expansion names"),
     count: int = Query(10, ge=1, le=20),
     db: Session = Depends(get_db),
