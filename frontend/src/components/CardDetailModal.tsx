@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getCardImageUrl } from "../card-images";
 
-import { getExpansionSymbol } from "../expansion-symbols";
+import { ExpansionSymbol } from "./ExpansionSymbol";
 import type { Card } from "../types";
 
 interface Props {
@@ -64,12 +64,7 @@ export default function CardDetailModal({ card, lang, onClose }: Props) {
                   ? (card.set_name_es || card.set_name)
                   : card.set_name}
               </span>
-              <span
-                className="expansion-symbol card-symbol"
-                dangerouslySetInnerHTML={{
-                  __html: getExpansionSymbol(card.set_name),
-                }}
-              />
+              <ExpansionSymbol name={card.set_name} className="expansion-symbol card-symbol" />
             </div>
             <div className="modal-text">
               {lang === "es"

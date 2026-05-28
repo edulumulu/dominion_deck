@@ -114,7 +114,7 @@ h1 {
 
 .expansion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 50%), 1fr));
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
@@ -550,10 +550,6 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  .expansion-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  }
-
   .card-grid {
     display: flex;
     flex-direction: column;
@@ -838,8 +834,8 @@ h1 {
   position: relative;
 }
 
-.card-list .manual-deck-card .card-body {
-  padding-right: 2.2rem;
+.manual-deck-card .card-body {
+  padding-right: 3rem;
 }
 
 .card-remove-btn {

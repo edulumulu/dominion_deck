@@ -2,15 +2,9 @@ import { getExpansionSymbol } from "../expansion-symbols";
 
 interface Props {
   name: string;
+  className?: string;
 }
 
-export function ExpansionSymbol({ name }: Props) {
-  const svg = getExpansionSymbol(name);
-  if (!svg) return <span className="expansion-symbol" />;
-  return (
-    <span
-      className="expansion-symbol"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
-  );
+export function ExpansionSymbol({ name, className = "expansion-symbol" }: Props) {
+  return <span className={className}>{getExpansionSymbol(name)}</span>;
 }

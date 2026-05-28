@@ -76,9 +76,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RandomCardsResponse | null>(null);
   const [error, setError] = useState("");
-  const [dark, setDark] = useState(() => localStorage.getItem("theme") !== "light");
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem("theme") !== "light"; } catch { return true; }
+  });
   const [listView, setListView] = useState(false);
-  const [lang, setLang] = useState<Lang>(() => (localStorage.getItem("lang") as Lang) || "es");
+  const [lang, setLang] = useState<Lang>(() => {
+    try { return (localStorage.getItem("lang") as Lang) || "es"; } catch { return "es"; }
+  });
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [manualCards, setManualCards] = useState<Card[]>([]);
   const [allCards, setAllCards] = useState<Card[]>([]);
@@ -126,7 +130,7 @@ function App() {
         setExpansions(exps);
       })
       .catch(() => setError("No se pudo conectar con el servidor"));
-    fetchAllCards().then(setAllCards).catch(() => {});
+    fetchAllCards().then(setAllCards).catch(() => setError("Could not connect to server"));
   }, []);
 
   const manualExtraPiles = useMemo(() => {
@@ -215,7 +219,7 @@ function App() {
             onClick={() =>
               setLang((p) => {
                 const next: Lang = p === "es" ? "en" : "es";
-                localStorage.setItem("lang", next);
+                try { localStorage.setItem("lang", next); } catch { /* noop */ }
                 return next;
               })
             }
@@ -228,7 +232,7 @@ function App() {
             onClick={() => {
               setDark((p) => {
                 const next = !p;
-                localStorage.setItem("theme", next ? "dark" : "light");
+                try { localStorage.setItem("theme", next ? "dark" : "light"); } catch { /* noop */ }
                 return next;
               });
             }}
