@@ -5,13 +5,19 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Resolve upstream DNS at request time, not at startup
+    resolver ${DNS_RESOLVER} valid=10s;
+
     location / {
         try_files $uri $uri/ /index.html;
     }
 
     location /api/ {
-        proxy_pass ${BACKEND_URL};
-        proxy_set_header Host $host;
+        set $backend "${BACKEND_URL}";
+        proxy_pass $backend;
+        proxy_ssl_server_name on;
+        proxy_ssl_protocols TLSv1.2 TLSv1.3;
+        proxy_set_header Host $proxy_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }

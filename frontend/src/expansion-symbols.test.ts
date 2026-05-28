@@ -1,14 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { isValidElement } from "react";
-import { getExpansionSymbol } from "./expansion-symbols";
+import { getExpansionSymbolSrc } from "./expansion-symbols";
 
-describe("getExpansionSymbol", () => {
-  it('returns a valid React element for "Dominion"', () => {
-    const svg = getExpansionSymbol("Dominion");
-    expect(isValidElement(svg)).toBe(true);
+describe("getExpansionSymbolSrc", () => {
+  it("returns a PNG path for Dominion", () => {
+    const src = getExpansionSymbolSrc("Dominion");
+    expect(src).toMatch(/\.png$/);
   });
 
-  it("returns valid React element for all known expansions", () => {
+  it("returns PNG paths for all known expansions", () => {
     const known = [
       "Dominion",
       "Intrigue",
@@ -23,23 +22,23 @@ describe("getExpansionSymbol", () => {
       "Empires",
       "Nocturne",
       "Renaissance",
-      "Promo",
-      "Base Cards",
+      "Menagerie",
+      "Allies",
+      "Plunder",
+      "Rising Sun",
     ];
     for (const name of known) {
-      expect(isValidElement(getExpansionSymbol(name))).toBe(true);
+      const src = getExpansionSymbolSrc(name);
+      expect(src).not.toBeNull();
+      expect(src).toMatch(/\.png$/);
     }
   });
 
-  it('falls back to Dominion SVG for "Unknown" expansion', () => {
-    const unknown = getExpansionSymbol("Unknown");
-    const dominion = getExpansionSymbol("Dominion");
-    expect(unknown).toBe(dominion);
+  it("returns null for unknown expansion", () => {
+    expect(getExpansionSymbolSrc("Unknown")).toBeNull();
   });
 
-  it("falls back to Dominion SVG for empty string", () => {
-    const empty = getExpansionSymbol("");
-    const dominion = getExpansionSymbol("Dominion");
-    expect(empty).toBe(dominion);
+  it("returns null for empty string", () => {
+    expect(getExpansionSymbolSrc("")).toBeNull();
   });
 });
