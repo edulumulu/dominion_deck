@@ -560,6 +560,29 @@ function App() {
           onClose={() => setSelectedCard(null)}
         />
       )}
+
+      <footer className="app-footer">
+        <p>
+          {lang === "es"
+            ? "Herramienta no oficial para el juego de cartas Dominion."
+            : "Unofficial tool for the Dominion card game."}
+        </p>
+        <p>
+          Dominion &copy;{" "}
+          <a href="https://www.riograndegames.com" target="_blank" rel="noopener noreferrer">
+            Rio Grande Games
+          </a>
+          {", "}
+          {lang === "es" ? "diseñado por" : "designed by"} Donald X. Vaccarino.{" "}
+          {lang === "es"
+            ? "Imágenes vía"
+            : "Card images via"}{" "}
+          <a href="https://github.com/connorburt/dominion-cards" target="_blank" rel="noopener noreferrer">
+            connorburt/dominion-cards
+          </a>
+          .
+        </p>
+      </footer>
     </div>
   );
 }
