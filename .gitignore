@@ -11,3 +11,5 @@ backend/.env
 frontend/.env
 .claude/
 .idea/
+DEPLOY_GUIDE.md
+STAGING_SETUP.md

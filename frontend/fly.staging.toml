@@ -1,11 +1,15 @@
-# fly.toml - production
-app = 'dominion-deck'
+# fly.toml app configuration file generated for dominion-deck-dev on 2026-05-28T13:32:00+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'dominion-deck-dev'
 primary_region = 'cdg'
 
 [build]
 
 [env]
-  BACKEND_URL = "http://dominion-deck-api.internal:8000"
+  BACKEND_URL = "http://dominion-deck-api-dev.internal:8000"
 
 [http_service]
   internal_port = 80

@@ -48,6 +48,6 @@ A streamlined workflow to add, verify, commit, push, and PR changes.
 
 7. **PR** — only if the user asked for one
    ```bash
-   gh pr create --base main --head <current-branch> --title "<title>" --body "<body>"
+   gh pr create --base develop --head <current-branch> --title "<title>" --body "<body>"
    ```
    Include a meaningful body that summarizes what changed and why.
