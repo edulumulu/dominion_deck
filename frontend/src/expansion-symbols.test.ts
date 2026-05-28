@@ -1,15 +1,14 @@
 import { describe, it, expect } from "vitest";
+import { isValidElement } from "react";
 import { getExpansionSymbol } from "./expansion-symbols";
 
 describe("getExpansionSymbol", () => {
-  it('returns a valid SVG string for "Dominion"', () => {
+  it('returns a valid React element for "Dominion"', () => {
     const svg = getExpansionSymbol("Dominion");
-    expect(svg).toContain("<svg");
-    expect(svg).toContain("</svg>");
-    expect(svg).toContain("viewBox");
+    expect(isValidElement(svg)).toBe(true);
   });
 
-  it("returns valid SVG for all known expansions", () => {
+  it("returns valid React element for all known expansions", () => {
     const known = [
       "Dominion",
       "Intrigue",
@@ -28,9 +27,7 @@ describe("getExpansionSymbol", () => {
       "Base Cards",
     ];
     for (const name of known) {
-      const svg = getExpansionSymbol(name);
-      expect(svg).toContain("<svg");
-      expect(svg).toContain("</svg>");
+      expect(isValidElement(getExpansionSymbol(name))).toBe(true);
     }
   });
 
