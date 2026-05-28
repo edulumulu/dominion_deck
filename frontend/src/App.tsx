@@ -563,9 +563,14 @@ function App() {
 
       <footer className="app-footer">
         <p>
+          {lang === "es" ? "Creado por" : "Created by"}{" "}
+          <a href="https://github.com/edulumulu" target="_blank" rel="noopener noreferrer">
+            edulumulu
+          </a>
+          {" · "}
           {lang === "es"
-            ? "Herramienta no oficial para el juego de cartas Dominion."
-            : "Unofficial tool for the Dominion card game."}
+            ? "Herramienta no oficial, no afiliada con Rio Grande Games."
+            : "Unofficial tool, not affiliated with Rio Grande Games."}
         </p>
         <p>
           Dominion &copy;{" "}
@@ -574,9 +579,7 @@ function App() {
           </a>
           {", "}
           {lang === "es" ? "diseñado por" : "designed by"} Donald X. Vaccarino.{" "}
-          {lang === "es"
-            ? "Imágenes vía"
-            : "Card images via"}{" "}
+          {lang === "es" ? "Imágenes vía" : "Card images via"}{" "}
           <a href="https://github.com/connorburt/dominion-cards" target="_blank" rel="noopener noreferrer">
             connorburt/dominion-cards
           </a>
