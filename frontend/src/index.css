@@ -155,11 +155,25 @@ h1 {
   height: 28px;
   flex-shrink: 0;
   color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .expansion-symbol svg {
   width: 100%;
   height: 100%;
+}
+
+.expansion-symbol-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(76%) sepia(70%) saturate(800%) hue-rotate(332deg);
+}
+
+.light .expansion-symbol-img {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(90%) saturate(600%) hue-rotate(15deg) brightness(0.85);
 }
 
 .card-symbol {
@@ -193,6 +207,21 @@ h1 {
 .badge-event {
   background: #1a3a2a;
   color: #86efac;
+}
+
+.light .badge-extra {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.light .badge-start {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.light .badge-event {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .badge-count {
@@ -474,6 +503,18 @@ h1 {
   border: 1px solid var(--border);
 }
 
+.light .badge-set {
+  background: #fef3c7;
+  color: var(--accent);
+  border: 1px solid #fcd34d;
+}
+
+.light .badge-type {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
 /* ── Extra Piles ── */
 
 .extra-piles {
@@ -636,6 +677,10 @@ h1 {
   margin: 0;
 }
 
+.light .sidebar-header h3 {
+  color: #92400e;
+}
+
 .sidebar-search {
   margin: 0.5rem 0.75rem;
   padding: 0.5rem 0.6rem;
@@ -753,6 +798,10 @@ h1 {
   font-size: 0.85rem;
   color: var(--accent);
   margin: 0;
+}
+
+.light .manual-selector-header h3 {
+  color: #92400e;
 }
 
 .manual-selector-arrow {
