@@ -9,7 +9,8 @@ primary_region = 'cdg'
 [build]
 
 [env]
-  BACKEND_URL = "http://dominion-deck-api-dev.internal:8000"
+  BACKEND_URL = "https://dominion-deck-api-dev.fly.dev"
+  DNS_RESOLVER = "[fdaa::3]"
 
 [http_service]
   internal_port = 80
