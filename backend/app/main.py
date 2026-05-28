@@ -18,7 +18,7 @@ cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost")
 
 limiter = Limiter(key_func=get_remote_address)
 
-app = FastAPI(title="Dominion Deck API")
+app = FastAPI(title="Dominion Deck API", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
