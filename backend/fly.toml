@@ -1,8 +1,4 @@
-# fly.toml app configuration file generated for dominion-deck-api on 2026-05-28T12:46:16+02:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
+# fly.toml - production
 app = 'dominion-deck-api'
 primary_region = 'cdg'
 
