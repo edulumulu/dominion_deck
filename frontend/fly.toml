@@ -6,6 +6,7 @@ primary_region = 'cdg'
 
 [env]
   BACKEND_URL = "http://dominion-deck-api.internal:8000"
+  DNS_RESOLVER = "[fdaa::3]"
 
 [http_service]
   internal_port = 80
