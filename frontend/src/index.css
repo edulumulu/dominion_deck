@@ -1046,6 +1046,62 @@ h1 {
   }
 }
 
+/* ── Modal: portrait móvil ── */
+
+@media (max-width: 600px) {
+  .modal-content {
+    max-height: 88dvh;
+  }
+
+  .modal-body {
+    padding: 0.75rem 1rem 1.25rem;
+    flex-direction: column;
+  }
+
+  .modal-img-wrap {
+    width: 110px;
+    margin: 0 auto;
+  }
+
+  .modal-close {
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ── Modal: landscape móvil ── */
+
+@media (max-height: 480px) {
+  .modal-content {
+    max-height: 90dvh;
+    min-height: 82dvh;
+    overflow-y: auto;
+  }
+
+  .modal-body {
+    flex-direction: row;
+    padding: 0.75rem 1rem;
+    gap: 0.85rem;
+    align-items: center;
+  }
+
+  .modal-img-wrap {
+    width: 155px;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-text {
+    font-size: 0.78rem;
+  }
+}
+
 /* ── Footer ── */
 
 .app-footer {
