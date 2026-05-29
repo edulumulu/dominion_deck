@@ -122,6 +122,7 @@ function App() {
   }, [dark]);
 
   useEffect(() => {
+    const onConnError = () => setError(UI.es.connection_error);
     fetchExpansions()
       .then((data) => {
         const exps = data.filter(
@@ -129,8 +130,8 @@ function App() {
         );
         setExpansions(exps);
       })
-      .catch(() => setError("No se pudo conectar con el servidor"));
-    fetchAllCards().then(setAllCards).catch(() => setError("Could not connect to server"));
+      .catch(onConnError);
+    fetchAllCards().then(setAllCards).catch(onConnError);
   }, []);
 
   const manualExtraPiles = useMemo(() => {
