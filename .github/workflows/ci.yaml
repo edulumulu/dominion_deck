@@ -146,7 +146,7 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install pip-audit && pip install -r backend/requirements.txt
       - name: pip-audit — backend dependencies
-        run: pip-audit -r backend/requirements.txt --severity high
+        run: pip-audit -r backend/requirements.txt
 
   # ── Integración: health check + E2E ──────────────────────────────────────────
   integration:
