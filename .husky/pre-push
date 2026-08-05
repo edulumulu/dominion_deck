@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-cd frontend && npm run test:e2e
+# E2E tests run in CI (integration job with Docker Compose)
